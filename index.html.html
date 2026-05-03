@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#f0faf4">
 <title>Vitagest — RH & Gestão de Pessoas</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
 <style>
 :root{--green:#2d7a4f;--green2:#e8f5ee;--green3:#166534;--teal:#2bb5a0;--bg:#f5f7f5;--surface:#fff;--border:#e2ebe5;--border2:#c8ddd0;--blue:#3b82f6;--amber:#f59e0b;--rose:#f43f5e;--violet:#8b5cf6;--t1:#1a2e25;--t2:#4d6b5a;--t3:#8aaa97;--t4:#c2d9cc;--sans:'Plus Jakarta Sans',sans-serif;--mono:'DM Mono',monospace;--r:14px;--r2:10px;--shadow:0 1px 3px rgba(26,46,37,.06),0 4px 12px rgba(26,46,37,.04);--shadow2:0 4px 20px rgba(26,46,37,.1);}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -164,6 +164,7 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
 .fade-in{animation:fi .25s ease;}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -212,7 +213,21 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
 // ══════════════════════════════════════
 const SUPA_URL = 'https://nanynbwmivtyopinptfr.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbnluYndtaXZ0eW9waW5wdGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NjU3ODYsImV4cCI6MjA5MzM0MTc4Nn0.T9hLvQcRJ8Gsa9uUVeMrQ4K7qkL1Ib3ZDoY0eRYoD2Q';
-const db = supabase.createClient(SUPA_URL, SUPA_KEY);
+const HEADERS = {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
+
+const db = {
+  from: (table) => ({
+    select: (cols='*') => ({
+      order: (col, opts={}) => fetch(`${SUPA_URL}/rest/v1/${table}?select=${cols}&order=${col}.${opts.ascending===false?'desc':'asc'}`, {headers: HEADERS}).then(r=>r.json()).then(data=>({data, error:null})).catch(e=>({data:[], error:e}))
+    }),
+    insert: (rows) => ({
+      select: () => fetch(`${SUPA_URL}/rest/v1/${table}`, {method:'POST', headers: HEADERS, body: JSON.stringify(rows[0])}).then(r=>r.json()).then(data=>({data: Array.isArray(data)?data:[data], error:null})).catch(e=>({data:[], error:e}))
+    }),
+    update: (data) => ({
+      eq: (col, val) => fetch(`${SUPA_URL}/rest/v1/${table}?${col}=eq.${val}`, {method:'PATCH', headers: HEADERS, body: JSON.stringify(data)}).then(r=>({error:null})).catch(e=>({error:e}))
+    })
+  })
+};
 
 let cache = {candidatos:[],admissoes:[],colaboradores:[],vagas:[]};
 let curPage = 'banco';
