@@ -196,7 +196,7 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
     <button class="btn btn-o btn-sm" onclick="syncAll()">🔄 Sincronizar</button>
     <button class="btn btn-g btn-sm" id="btnadd" onclick="openNewCand()">+ Candidato</button>
   </div>
-  <div class="content" id="pg"><div class="loading"><div class="spinner"></div>Carregando...</div></div>
+  <div class="content" id="pg"></div>
 </main>
 </div>
 
@@ -668,8 +668,9 @@ a.appendChild(t);
 setTimeout(()=>{t.style.opacity=‘0’;t.style.transform=‘translateX(100%)’;t.style.transition=‘all .3s’;setTimeout(()=>t.remove(),300);},4000);
 }
 
-// INIT
-syncAll();
+// INIT - carrega página primeiro, depois busca dados
+renderPage();
+setTimeout(syncAll, 100);
 </script>
 
 </body>
