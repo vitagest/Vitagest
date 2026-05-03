@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f0faf4">
+<title>Vitagest — Trabalhe Conosco</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#2d7a4f;--green2:#e8f5ee;--green3:#166534;
+  --teal:#2bb5a0;--bg:#f5f7f5;--surface:#fff;
+  --border:#e2ebe5;--border2:#c8ddd0;
+  --t1:#1a2e25;--t2:#4d6b5a;--t3:#8aaa97;--t4:#c2d9cc;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --r:14px;--r2:10px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100vh;}
+
+/* HEADER */
+.header{background:var(--green);padding:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15);}
+.header-inner{max-width:680px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:12px;}
+.header-icon{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;}
+.header-icon svg{width:22px;height:22px;}
+.header-name{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.3px;}
+.header-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:1px;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--green) 0%,#1a5c3a 60%,var(--teal) 100%);padding:48px 24px 56px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);}
+.hero::after{content:'';position:absolute;bottom:-60px;left:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:11px;color:rgba(255,255,255,.9);letter-spacing:.5px;margin-bottom:16px;}
+.hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:#a3d977;}
+.hero-title{font-size:30px;font-weight:800;color:#fff;letter-spacing:-.6px;line-height:1.15;margin-bottom:12px;}
+.hero-desc{font-size:14px;color:rgba(255,255,255,.75);max-width:440px;margin:0 auto;line-height:1.6;}
+
+/* FORM WRAPPER */
+.form-wrap{max-width:680px;margin:-28px auto 40px;padding:0 20px;}
+.form-card{background:var(--surface);border-radius:20px;box-shadow:0 8px 40px rgba(26,46,37,.12);overflow:hidden;}
+
+/* PROGRESS */
+.progress-bar{height:4px;background:var(--green2);}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:2px;transition:width .4s ease;}
+.step-indicator{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg);}
+.step-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--t3);}
+.step-item.active{color:var(--green);font-weight:600;}
+.step-item.done{color:var(--green);}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);flex-shrink:0;}
+.step-item.active .step-num{background:var(--green);color:#fff;}
+.step-item.done .step-num{background:var(--green2);color:var(--green);}
+.step-conn{flex:1;height:1px;background:var(--border);margin:0 8px;}
+
+/* FORM CONTENT */
+.form-content{padding:28px 28px 20px;}
+.section-title{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:4px;letter-spacing:-.3px;}
+.section-desc{font-size:13px;color:var(--t3);margin-bottom:24px;}
+
+.field{margin-bottom:16px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.field label span{color:#dc2626;}
+
+input,select,textarea{
+  width:100%;padding:12px 14px;
+  border:1.5px solid var(--border);border-radius:var(--r2);
+  font-size:14px;font-family:var(--sans);color:var(--t1);
+  background:var(--surface);outline:none;
+  transition:all .2s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(45,122,79,.1);}
+input::placeholder,textarea::placeholder{color:var(--t4);}
+select{cursor:pointer;color:var(--t2);}
+select.filled{color:var(--t1);}
+textarea{resize:vertical;min-height:100px;line-height:1.6;}
+
+.field-hint{font-size:11px;color:var(--t3);margin-top:4px;}
+
+/* CHECKBOX GROUP */
+.check-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.check-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r2);cursor:pointer;transition:all .15s;}
+.check-item:hover{border-color:var(--green);background:var(--green2);}
+.check-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);flex-shrink:0;cursor:pointer;}
+.check-item label{font-size:13px;color:var(--t1);cursor:pointer;line-height:1.3;}
+
+/* BUTTONS */
+.form-footer{padding:20px 28px 28px;display:flex;gap:10px;justify-content:space-between;align-items:center;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:13px 24px;border-radius:var(--r2);font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:var(--sans);}
+.btn-primary{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(45,122,79,.3);}
+.btn-primary:hover{background:#236040;transform:translateY(-1px);}
+.btn-secondary{background:var(--surface);color:var(--t2);border:1.5px solid var(--border2);}
+.btn-secondary:hover{border-color:var(--green);color:var(--green);}
+
+/* SUCCESS */
+.success-screen{text-align:center;padding:48px 28px;}
+.success-icon{width:72px;height:72px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;}
+.success-title{font-size:22px;font-weight:800;color:var(--t1);margin-bottom:8px;letter-spacing:-.4px;}
+.success-desc{font-size:14px;color:var(--t3);line-height:1.6;max-width:380px;margin:0 auto 24px;}
+.success-code{background:var(--green2);border:1.5px solid var(--border2);border-radius:var(--r2);padding:14px 20px;display:inline-block;font-size:20px;font-weight:800;color:var(--green);letter-spacing:2px;font-family:monospace;}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px;font-size:12px;color:var(--t3);}
+.footer a{color:var(--green);text-decoration:none;}
+
+/* TOAST */
+.toast-area{position:fixed;bottom:16px;right:16px;z-index:1000;display:flex;flex-direction:column;gap:7px;}
+.toast{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:12px 16px;display:flex;align-items:center;gap:9px;min-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.1);font-size:13px;animation:tin .25s ease;}
+@keyframes tin{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.ok{border-left:4px solid var(--green);}
+.toast.err{border-left:4px solid #dc2626;}
+.toast.warn{border-left:4px solid #d97706;}
+
+@media(max-width:520px){
+  .hero-title{font-size:24px;}
+  .field-row{grid-template-columns:1fr;}
+  .check-group{grid-template-columns:1fr;}
+  .form-content{padding:20px 16px 16px;}
+  .form-footer{padding:16px;}
+  .step-item span{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-icon">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M2 11 L6 11 L8 5 L11 17 L14 8 L16 11 L20 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <div class="header-name">VITAGEST</div>
+      <div class="header-sub">Gestão de Pessoas</div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Trabalhe Conosco</div>
+  <div class="hero-title">Faça parte da nossa equipe</div>
+  <div class="hero-desc">Preencha o formulário abaixo e entraremos em contato quando surgir uma oportunidade compatível com seu perfil.</div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap">
+  <div class="form-card">
+
+    <!-- PROGRESS -->
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:33%"></div></div>
+
+    <!-- STEP INDICATOR -->
+    <div class="step-indicator">
+      <div class="step-item active" id="si1">
+        <div class="step-num">1</div>
+        <span>Dados pessoais</span>
+      </div>
+      <div class="step-conn"></div>
+      <div class="step-item" id="si2">
+        <div class="step-num">2</div>
+        <span>Contato</span>
+      </div>
+      <div class="step-conn"></div>
+      <div class="step-item" id="si3">
+        <div class="step-num">3</div>
+        <span>Profissional</span>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="step1">
+      <div class="form-content">
+        <div class="section-title">Dados Pessoais</div>
+        <div class="section-desc">Informações básicas para o seu cadastro</div>
+
+        <div class="field">
+          <label>Nome completo <span>*</span></label>
+          <input type="text" id="nome" placeholder="Seu nome completo" autocomplete="name">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>CPF <span>*</span></label>
+            <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)">
+          </div>
+          <div class="field">
+            <label>RG</label>
+            <input type="text" id="rg" placeholder="0000000">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Data de nascimento</label>
+            <input type="date" id="nascimento">
+          </div>
+          <div class="field">
+            <label>Estado civil</label>
+            <select id="estadoCivil" onchange="this.classList.add('filled')">
+              <option value="">Selecione</option>
+              <option value="solteiro">Solteiro(a)</option>
+              <option value="casado">Casado(a)</option>
+              <option value="divorciado">Divorciado(a)</option>
+              <option value="viuvo">Viúvo(a)</option>
+              <option value="uniao_estavel">União estável</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Filhos / dependentes</label>
+          <select id="filhos" onchange="this.classList.add('filled')">
+            <option value="0">Nenhum</option>
+            <option value="1">1 filho</option>
+            <option value="2">2 filhos</option>
+            <option value="3">3 filhos</option>
+            <option value="4">4 ou mais</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-footer">
+        <div style="font-size:12px;color:var(--t3)">Passo 1 de 3</div>
+        <button class="btn btn-primary" onclick="nextStep(2)">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step2" style="display:none">
+      <div class="form-content">
+        <div class="section-title">Contato & Endereço</div>
+        <div class="section-desc">Como podemos entrar em contato com você</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>WhatsApp <span>*</span></label>
+            <input type="tel" id="telefone" placeholder="(51) 9 0000-0000" oninput="maskPhone(this)">
+            <div class="field-hint">Usado para comunicação sobre vagas</div>
+          </div>
+          <div class="field">
+            <label>E-mail</label>
+            <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Endereço completo</label>
+          <input type="text" id="endereco" placeholder="Rua, número, bairro">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Cidade <span>*</span></label>
+            <input type="text" id="cidade" placeholder="Sua cidade">
+          </div>
+          <div class="field">
+            <label>Estado</label>
+            <select id="estado" onchange="this.classList.add('filled')">
+              <option value="RS">RS</option>
+              <option value="SC">SC</option>
+              <option value="PR">PR</option>
+              <option value="SP">SP</option>
+              <option value="RJ">RJ</option>
+              <option value="MG">MG</option>
+              <option value="BA">BA</option>
+              <option value="PE">PE</option>
+              <option value="CE">CE</option>
+              <option value="GO">GO</option>
+              <option value="AM">AM</option>
+              <option value="PA">PA</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-secondary" onclick="prevStep(1)">← Voltar</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step3" style="display:none">
+      <div class="form-content">
+        <div class="section-title">Perfil Profissional</div>
+        <div class="section-desc">Suas qualificações e interesse de trabalho</div>
+
+        <div class="field">
+          <label>Cargo de interesse <span>*</span></label>
+          <select id="cargo" onchange="this.classList.add('filled')">
+            <option value="">Selecione o cargo</option>
+            <optgroup label="Saúde">
+              <option>Enfermeiro(a)</option>
+              <option>Técnico(a) de Enfermagem</option>
+              <option>Auxiliar de Enfermagem</option>
+              <option>Fisioterapeuta</option>
+              <option>Fonoaudiólogo(a)</option>
+              <option>Nutricionista</option>
+              <option>Psicólogo(a)</option>
+              <option>Médico(a)</option>
+            </optgroup>
+            <optgroup label="Administrativo">
+              <option>Auxiliar Administrativo</option>
+              <option>Assistente Administrativo</option>
+              <option>Recepcionista</option>
+              <option>Assistente Financeiro</option>
+            </optgroup>
+            <optgroup label="Operacional">
+              <option>Auxiliar de Serviços Gerais</option>
+              <option>Motorista</option>
+              <option>Cozinheiro(a)</option>
+              <option>Auxiliar de Cozinha</option>
+            </optgroup>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="field" id="cargoOutro" style="display:none">
+          <label>Qual cargo?</label>
+          <input type="text" id="cargoTexto" placeholder="Descreva o cargo">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Escolaridade <span>*</span></label>
+            <select id="escolaridade" onchange="this.classList.add('filled')">
+              <option value="">Selecione</option>
+              <option value="fundamental_incompleto">Fundamental incompleto</option>
+              <option value="fundamental_completo">Fundamental completo</option>
+              <option value="medio_completo">Médio completo</option>
+              <option value="medio_cursando">Médio cursando</option>
+              <option value="tecnico_completo">Técnico completo</option>
+              <option value="tecnico_cursando">Técnico cursando</option>
+              <option value="superior_completo">Superior completo</option>
+              <option value="superior_cursando">Superior cursando</option>
+              <option value="pos_graduacao">Pós-graduação</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Disponibilidade</label>
+            <select id="disponibilidade" onchange="this.classList.add('filled')">
+              <option value="imediata">Imediata</option>
+              <option value="7_dias">Em 7 dias</option>
+              <option value="15_dias">Em 15 dias</option>
+              <option value="30_dias">Em 30 dias</option>
+              <option value="60_dias">Em 60 dias</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Pretensão salarial (R$)</label>
+            <input type="text" id="pretensao" placeholder="Ex: 2500" oninput="maskMoney(this)">
+          </div>
+          <div class="field">
+            <label>Cidade onde pode trabalhar</label>
+            <input type="text" id="cidadeTrabalho" placeholder="Pode ser diferente da sua">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Experiências profissionais <span>*</span></label>
+          <textarea id="experiencias" placeholder="Descreva suas experiências anteriores, empresas onde trabalhou, tempo de atuação na área..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Possui CNH?</label>
+          <div class="check-group" style="grid-template-columns:repeat(3,1fr)">
+            <div class="check-item">
+              <input type="checkbox" id="cnh_nao" name="cnh">
+              <label for="cnh_nao">Não possuo</label>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" id="cnh_b" name="cnh">
+              <label for="cnh_b">CNH B</label>
+            </div>
+            <div class="check-item">
+              <input type="checkbox" id="cnh_d" name="cnh">
+              <label for="cnh_d">CNH D/E</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Termos e privacidade <span>*</span></label>
+          <div class="check-item" style="margin-top:4px">
+            <input type="checkbox" id="lgpd">
+            <label for="lgpd">Autorizo o uso dos meus dados para fins de recrutamento e seleção pela Vitagest, conforme a LGPD (Lei 13.709/2018).</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-secondary" onclick="prevStep(2)">← Voltar</button>
+        <button class="btn btn-primary" onclick="submitForm()" id="btnSubmit">Enviar cadastro ✓</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="stepSuccess" style="display:none">
+      <div class="success-screen">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Cadastro enviado!</div>
+        <div class="success-desc">Seus dados foram recebidos com sucesso. Entraremos em contato quando surgir uma oportunidade compatível com seu perfil.</div>
+        <div style="margin-bottom:24px">
+          <div style="font-size:12px;color:var(--t3);margin-bottom:8px">Seu código de cadastro:</div>
+          <div class="success-code" id="codigoCandidato">VG-0000</div>
+        </div>
+        <div style="background:var(--green2);border-radius:var(--r2);padding:16px;font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px">
+          💬 Você pode entrar em contato conosco pelo WhatsApp para confirmar o recebimento ou tirar dúvidas.
+        </div>
+        <button class="btn btn-secondary" onclick="novoCadastro()">Indicar um amigo</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  <p>© 2026 Vitagest — Gestão de Pessoas · Todos os direitos reservados</p>
+</div>
+
+<div class="toast-area" id="toasts"></div>
+
+<script>
+let currentStep = 1;
+
+// ── NAVEGAÇÃO ENTRE STEPS ──────────────────────
+function nextStep(step) {
+  if (step === 2 && !validateStep1()) return;
+  if (step === 3 && !validateStep2()) return;
+  goToStep(step);
+}
+
+function prevStep(step) { goToStep(step); }
+
+function goToStep(step) {
+  [1,2,3].forEach(s => {
+    const el = document.getElementById('step'+s);
+    if (el) el.style.display = s === step ? 'block' : 'none';
+  });
+  currentStep = step;
+  updateProgress();
+  updateStepIndicator();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateProgress() {
+  const pct = {1:33, 2:66, 3:100}[currentStep] || 33;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function updateStepIndicator() {
+  [1,2,3].forEach(s => {
+    const el = document.getElementById('si'+s);
+    if (!el) return;
+    el.classList.remove('active','done');
+    if (s === currentStep) el.classList.add('active');
+    else if (s < currentStep) el.classList.add('done');
+  });
+}
+
+// ── VALIDAÇÕES ──────────────────────────────────
+function validateStep1() {
+  const nome = document.getElementById('nome').value.trim();
+  const cpf = document.getElementById('cpf').value.trim();
+  if (!nome) { toast('Informe seu nome completo','warn'); document.getElementById('nome').focus(); return false; }
+  if (!cpf || cpf.length < 11) { toast('Informe um CPF válido','warn'); document.getElementById('cpf').focus(); return false; }
+  return true;
+}
+
+function validateStep2() {
+  const tel = document.getElementById('telefone').value.trim();
+  const cidade = document.getElementById('cidade').value.trim();
+  if (!tel) { toast('Informe seu WhatsApp','warn'); document.getElementById('telefone').focus(); return false; }
+  if (!cidade) { toast('Informe sua cidade','warn'); document.getElementById('cidade').focus(); return false; }
+  return true;
+}
+
+function validateStep3() {
+  const cargo = document.getElementById('cargo').value;
+  const esc = document.getElementById('escolaridade').value;
+  const exp = document.getElementById('experiencias').value.trim();
+  const lgpd = document.getElementById('lgpd').checked;
+  if (!cargo) { toast('Selecione o cargo de interesse','warn'); return false; }
+  if (!esc) { toast('Selecione sua escolaridade','warn'); return false; }
+  if (!exp) { toast('Descreva suas experiências','warn'); document.getElementById('experiencias').focus(); return false; }
+  if (!lgpd) { toast('Aceite os termos de privacidade para continuar','warn'); return false; }
+  return true;
+}
+
+// ── SUBMIT ──────────────────────────────────────
+function submitForm() {
+  if (!validateStep3()) return;
+
+  const btn = document.getElementById('btnSubmit');
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+
+  const cargo = document.getElementById('cargo').value === 'outro'
+    ? document.getElementById('cargoTexto').value
+    : document.getElementById('cargo').value;
+
+  const cnh = [];
+  if (document.getElementById('cnh_b').checked) cnh.push('B');
+  if (document.getElementById('cnh_d').checked) cnh.push('D/E');
+
+  // Score automático
+  const esc = document.getElementById('escolaridade').value;
+  let score = 50;
+  score += ({pos_graduacao:20,superior_completo:18,superior_cursando:12,tecnico_completo:12,medio_completo:5}[esc]||0);
+  if (document.getElementById('experiencias').value.length > 100) score += 15;
+  if (document.getElementById('disponibilidade').value === 'imediata') score += 8;
+  if (document.getElementById('telefone').value) score += 5;
+  score = Math.min(99, Math.max(30, score));
+
+  const dados = {
+    nome: document.getElementById('nome').value.trim(),
+    cpf: document.getElementById('cpf').value.trim(),
+    rg: document.getElementById('rg').value.trim(),
+    nascimento: document.getElementById('nascimento').value,
+    estadoCivil: document.getElementById('estadoCivil').value,
+    filhos: document.getElementById('filhos').value,
+    telefone: document.getElementById('telefone').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    endereco: document.getElementById('endereco').value.trim(),
+    cidade: document.getElementById('cidade').value.trim(),
+    estado: document.getElementById('estado').value,
+    cargo: cargo,
+    escolaridade: esc,
+    disponibilidade: document.getElementById('disponibilidade').value,
+    pretensao: document.getElementById('pretensao').value,
+    cidadeTrabalho: document.getElementById('cidadeTrabalho').value.trim(),
+    experiencias: document.getElementById('experiencias').value.trim(),
+    cnh: cnh.join(','),
+    score: score,
+    status: 'novo',
+    docs: [],
+    criadoEm: new Date().toISOString().split('T')[0],
+    origem: 'formulario_publico'
+  };
+
+  // Salvar no localStorage (compatível com o sistema admin)
+  try {
+    const SK = 'vitagest_v2';
+    let db = JSON.parse(localStorage.getItem(SK) || '{"candidatos":[],"admissoes":[],"colaboradores":[],"vagas":[],"nextId":1}');
+    dados.id = db.nextId++;
+    db.candidatos.unshift(dados);
+    localStorage.setItem(SK, JSON.stringify(db));
+  } catch(e) {}
+
+  // Salvar também em chave separada para não perder
+  try {
+    const pendentes = JSON.parse(localStorage.getItem('vg_pendentes') || '[]');
+    pendentes.unshift(dados);
+    localStorage.setItem('vg_pendentes', JSON.stringify(pendentes));
+  } catch(e) {}
+
+  // Gerar código
+  const codigo = 'VG-' + String(Math.floor(Math.random() * 9000) + 1000);
+
+  setTimeout(() => {
+    [1,2,3].forEach(s => {
+      const el = document.getElementById('step'+s);
+      if (el) el.style.display = 'none';
+    });
+    document.getElementById('progress').style.width = '100%';
+    document.getElementById('codigoCandidato').textContent = codigo;
+    document.getElementById('stepSuccess').style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }, 1200);
+}
+
+function novoCadastro() {
+  document.getElementById('stepSuccess').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+  document.querySelectorAll('input:not([type=checkbox]), select, textarea').forEach(el => el.value = '');
+  document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
+  currentStep = 1;
+  updateProgress();
+  updateStepIndicator();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── MASKS ───────────────────────────────────────
+function maskCPF(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,11);
+  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d+)/,'$1.$2.$3');
+  else if (v.length > 3) v = v.replace(/(\d{3})(\d+)/,'$1.$2');
+  el.value = v;
+}
+
+function maskPhone(el) {
+  let v = el.value.replace(/\D/g,'').substring(0,11);
+  if (v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  else if (v.length > 6) v = v.replace(/(\d{2})(\d{4})(\d+)/,'($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/(\d{2})(\d+)/,'($1) $2');
+  el.value = v;
+}
+
+function maskMoney(el) {
+  let v = el.value.replace(/\D/g,'');
+  el.value = v ? parseInt(v).toLocaleString('pt-BR') : '';
+}
+
+// ── CARGO OUTRO ─────────────────────────────────
+document.getElementById('cargo').addEventListener('change', function() {
+  document.getElementById('cargoOutro').style.display = this.value === 'outro' ? 'block' : 'none';
+});
+
+// ── TOAST ───────────────────────────────────────
+function toast(msg, type='ok') {
+  const a = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span style="font-size:16px">${type==='ok'?'✅':type==='warn'?'⚠️':'❌'}</span><span>${msg}</span>`;
+  a.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, 4000);
+}
+</script>
+</body>
+</html>
