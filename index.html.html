@@ -215,18 +215,45 @@ const SUPA_URL = 'https://nanynbwmivtyopinptfr.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbnluYndtaXZ0eW9waW5wdGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NjU3ODYsImV4cCI6MjA5MzM0MTc4Nn0.T9hLvQcRJ8Gsa9uUVeMrQ4K7qkL1Ib3ZDoY0eRYoD2Q';
 const HEADERS = {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
 
+function sbFetch(path, opts) {
+  return fetch(SUPA_URL + '/rest/v1/' + path, Object.assign({headers: HEADERS}, opts)).then(function(r){return r.json();});
+}
+
 const db = {
-  from: (table) => ({
-    select: (cols='*') => ({
-      order: (col, opts={}) => fetch(`${SUPA_URL}/rest/v1/${table}?select=${cols}&order=${col}.${opts.ascending===false?'desc':'asc'}`, {headers: HEADERS}).then(r=>r.json()).then(data=>({data, error:null})).catch(e=>({data:[], error:e}))
-    }),
-    insert: (rows) => ({
-      select: () => fetch(`${SUPA_URL}/rest/v1/${table}`, {method:'POST', headers: HEADERS, body: JSON.stringify(rows[0])}).then(r=>r.json()).then(data=>({data: Array.isArray(data)?data:[data], error:null})).catch(e=>({data:[], error:e}))
-    }),
-    update: (data) => ({
-      eq: (col, val) => fetch(`${SUPA_URL}/rest/v1/${table}?${col}=eq.${val}`, {method:'PATCH', headers: HEADERS, body: JSON.stringify(data)}).then(r=>({error:null})).catch(e=>({error:e}))
-    })
-  })
+  from: function(table) {
+    return {
+      select: function(cols) {
+        cols = cols || '*';
+        return {
+          order: function(col, opts) {
+            opts = opts || {};
+            var dir = opts.ascending === false ? 'desc' : 'asc';
+            return sbFetch(table + '?select=' + cols + '&order=' + col + '.' + dir)
+              .then(function(data){return {data: data, error: null};})
+              .catch(function(e){return {data: [], error: e};});
+          }
+        };
+      },
+      insert: function(rows) {
+        return {
+          select: function() {
+            return sbFetch(table, {method: 'POST', body: JSON.stringify(rows[0])})
+              .then(function(data){return {data: Array.isArray(data)?data:[data], error: null};})
+              .catch(function(e){return {data: [], error: e};});
+          }
+        };
+      },
+      update: function(data) {
+        return {
+          eq: function(col, val) {
+            return sbFetch(table + '?' + col + '=eq.' + val, {method: 'PATCH', body: JSON.stringify(data)})
+              .then(function(){return {error: null};})
+              .catch(function(e){return {error: e};});
+          }
+        };
+      }
+    };
+  }
 };
 
 let cache = {candidatos:[],admissoes:[],colaboradores:[],vagas:[]};
