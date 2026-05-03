@@ -539,7 +539,18 @@ function submitForm() {
     origem: 'formulario_publico'
   };
 
-  // Salvar no localStorage (compatível com o sistema admin)
+  // Enviar para Google Sheets via Apps Script
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygTc_tVfckEkBSyZHGWE5Lm1rxg6p9kDjYGG-86JrsRO-fjyMZ7DKnvWhXZLbS-nPA/exec";
+  
+  fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({acao: "salvar", tabela: "candidatos", dados: dados})
+  }).then(r => r.json()).then(j => {
+    console.log("Salvo no Sheets:", j);
+  }).catch(e => console.log("Erro Sheets:", e));
+
+  // Salvar no localStorage (backup local)
   try {
     const SK = 'vitagest_v2';
     let db = JSON.parse(localStorage.getItem(SK) || '{"candidatos":[],"admissoes":[],"colaboradores":[],"vagas":[],"nextId":1}');
