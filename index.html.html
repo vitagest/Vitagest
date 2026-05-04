@@ -1,1 +1,704 @@
+<!DOCTYPE html>
 
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f0faf4">
+<title>Vitagest — RH & Gestão de Pessoas</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{--green:#2d7a4f;--green2:#e8f5ee;--green3:#166534;--teal:#2bb5a0;--bg:#f5f7f5;--surface:#fff;--border:#e2ebe5;--border2:#c8ddd0;--blue:#3b82f6;--amber:#f59e0b;--rose:#f43f5e;--violet:#8b5cf6;--t1:#1a2e25;--t2:#4d6b5a;--t3:#8aaa97;--t4:#c2d9cc;--sans:'Plus Jakarta Sans',sans-serif;--mono:'DM Mono',monospace;--r:14px;--r2:10px;--shadow:0 1px 3px rgba(26,46,37,.06),0 4px 12px rgba(26,46,37,.04);--shadow2:0 4px 20px rgba(26,46,37,.1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);background:var(--bg);color:var(--t1);min-height:100vh;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:250px;background:#1a2e25;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .3s;}
+.sb-brand{padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;}
+.sb-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#a3d977,#2d7a4f,#2bb5a0);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(45,122,79,.4);}
+.sb-icon svg{width:22px;height:22px;}
+.sb-name{font-size:17px;font-weight:800;color:#fff;letter-spacing:-.3px;}
+.sb-sub{font-size:9px;color:rgba(255,255,255,.3);font-family:var(--mono);letter-spacing:.8px;margin-top:1px;}
+.nav{padding:14px 10px;flex:1;}
+.nav-lbl{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.3);padding:10px 10px 5px;}
+.nb{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:13px;color:rgba(255,255,255,.5);transition:all .15s;position:relative;font-family:var(--sans);}
+.nb:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.8);}
+.nb.active{background:rgba(45,122,79,.25);color:#fff;font-weight:600;}
+.nb.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:linear-gradient(180deg,#a3d977,#2bb5a0);border-radius:0 3px 3px 0;}
+.nbadge{margin-left:auto;font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:20px;background:rgba(45,122,79,.3);color:#a3d977;}
+.nbadge.red{background:rgba(244,63,94,.2);color:#ff8096;}
+.nbadge.amber{background:rgba(245,158,11,.2);color:#fcd34d;}
+.sb-user{padding:14px 18px;margin:8px 10px;background:rgba(255,255,255,.06);border-radius:10px;display:flex;align-items:center;gap:9px;}
+.u-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2d7a4f,#2bb5a0);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;}
+.u-nm{font-size:12px;font-weight:700;color:#fff;}
+.u-rl{font-size:9px;color:rgba(255,255,255,.3);font-family:var(--mono);}
+.main{margin-left:250px;flex:1;display:flex;flex-direction:column;}
+.topbar{height:60px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:14px;position:sticky;top:0;z-index:100;background:rgba(245,247,245,.92);backdrop-filter:blur(16px);}
+.tb-title{font-size:16px;font-weight:800;color:var(--t1);flex:1;letter-spacing:-.3px;}
+.sync{display:flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);color:var(--t3);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.dot.off{background:var(--rose);}
+.dot.loading{background:var(--amber);animation:blink .6s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--r2);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:var(--sans);}
+.btn-g{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(45,122,79,.3);}
+.btn-g:hover{background:#236040;transform:translateY(-1px);}
+.btn-o{background:var(--surface);color:var(--t2);border:1.5px solid var(--border2);box-shadow:var(--shadow);}
+.btn-o:hover{border-color:var(--green);color:var(--green);}
+.btn-d{background:#fff0f3;color:var(--rose);border:1.5px solid #ffc9d2;}
+.btn-sm{padding:6px 13px;font-size:12px;}
+.content{padding:26px 28px;flex:1;}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:14px;flex-wrap:wrap;}
+.ph-eye{font-size:11px;color:var(--green);margin-bottom:4px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;}
+.ph-t{font-size:24px;font-weight:800;letter-spacing:-.5px;}
+.ph-d{font-size:13px;color:var(--t3);margin-top:4px;}
+.ph-a{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);transition:all .2s;}
+.stat:hover{transform:translateY(-1px);box-shadow:var(--shadow2);}
+.st-l{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600;}
+.st-n{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.st-f{font-size:11px;color:var(--t3);margin-top:3px;}
+.toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.srch{display:flex;align-items:center;gap:7px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:8px 13px;flex:1;min-width:180px;box-shadow:var(--shadow);}
+.srch:focus-within{border-color:var(--green);}
+.srch input{border:none;background:transparent;outline:none;color:var(--t1);font-size:13px;font-family:var(--sans);flex:1;}
+.srch input::placeholder{color:var(--t4);}
+.fsel{background:var(--surface);border:1.5px solid var(--border);color:var(--t2);border-radius:var(--r2);padding:8px 11px;font-size:12px;font-family:var(--mono);outline:none;cursor:pointer;box-shadow:var(--shadow);}
+.fsel:focus{border-color:var(--green);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;box-shadow:var(--shadow);}
+.card:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:var(--shadow2);}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0;}
+.ca::before{background:linear-gradient(90deg,var(--green),var(--teal));}
+.cm::before{background:var(--amber);}
+.cb::before{background:var(--border2);}
+.ch{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.av{width:42px;height:42px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--green);flex-shrink:0;}
+.cn{font-size:14px;font-weight:700;}
+.cc{font-size:12px;color:var(--green);margin-top:1px;}
+.sc{margin-left:auto;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;border:2px solid;flex-shrink:0;}
+.sca{border-color:var(--green);color:var(--green);background:var(--green2);}
+.scm{border-color:var(--amber);color:var(--amber);background:#fffbeb;}
+.scb{border-color:var(--border2);color:var(--t3);background:var(--bg);}
+.ci{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
+.cii{font-size:12px;color:var(--t2);}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.tag{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:20px;}
+.tg-g{background:var(--green2);color:var(--green3);}
+.tg-b{background:#eff6ff;color:#1e40af;}
+.tg-r{background:#fff0f3;color:var(--rose);}
+.tg-gray{background:var(--bg);color:var(--t3);}
+.sp{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:10px;font-family:var(--mono);}
+.sp-n{background:#eff6ff;color:#1e40af;}
+.sp-a{background:#fffbeb;color:#92400e;}
+.sp-ap{background:var(--green2);color:var(--green3);}
+.sp-r{background:#fff0f3;color:var(--rose);}
+.sp-c{background:#f5f3ff;color:#5b21b6;}
+.cf{display:flex;gap:7px;}
+.cf .btn{flex:1;justify-content:center;}
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.kol{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
+.kh{padding:10px 13px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);}
+.kt{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px;font-weight:500;}
+.kc{width:20px;height:20px;border-radius:6px;background:var(--surface);font-size:10px;font-family:var(--mono);display:flex;align-items:center;justify-content:center;font-weight:700;border:1px solid var(--border);}
+.kb{padding:8px;display:flex;flex-direction:column;gap:7px;min-height:100px;}
+.kcard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);}
+.kcard:hover{border-color:var(--green);}
+.kn{font-size:12px;font-weight:700;margin-bottom:2px;}
+.kr{font-size:11px;color:var(--t3);margin-bottom:5px;}
+.km{font-size:10px;font-family:var(--mono);color:var(--t3);display:flex;justify-content:space-between;}
+.kpd{font-size:10px;color:var(--rose);margin-top:4px;}
+.kwpp{display:inline-flex;align-items:center;gap:3px;margin-top:6px;font-size:10px;color:#166534;text-decoration:none;background:var(--green2);padding:3px 7px;border-radius:6px;}
+.kprog{height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;}
+.kpf{height:100%;border-radius:2px;}
+.tw{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:10px 14px;text-align:left;font-size:10px;font-family:var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--t3);background:var(--bg);border-bottom:1.5px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer;}
+tbody tr:hover{background:var(--bg);}
+tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
+.ov{position:fixed;inset:0;background:rgba(26,46,37,.4);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.ov.open{opacity:1;pointer-events:all;}
+.mod{background:var(--surface);border:1.5px solid var(--border2);border-radius:18px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;transform:translateY(14px);transition:transform .2s;box-shadow:0 24px 60px rgba(26,46,37,.2);}
+.ov.open .mod{transform:translateY(0);}
+.mh{padding:20px 22px 16px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2;border-radius:18px 18px 0 0;}
+.mt{font-size:17px;font-weight:800;letter-spacing:-.3px;}
+.mx{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--t3);transition:all .15s;}
+.mx:hover{border-color:var(--rose);color:var(--rose);}
+.mb{padding:22px;}
+.mf{padding:14px 22px;border-top:1.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface);border-radius:0 0 18px 18px;}
+.fs{margin-bottom:20px;}
+.fst{font-size:11px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--green);margin-bottom:12px;padding-bottom:7px;border-bottom:1.5px solid var(--green2);}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ff{grid-column:1/-1;}
+.fg2{display:flex;flex-direction:column;gap:4px;}
+.fl{font-size:10px;font-family:var(--mono);color:var(--t2);text-transform:uppercase;letter-spacing:.4px;}
+.fi,.fse,.ftx{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r2);padding:9px 11px;color:var(--t1);font-size:13px;font-family:var(--sans);outline:none;width:100%;transition:border-color .15s;}
+.fi:focus,.fse:focus,.ftx:focus{border-color:var(--green);background:var(--surface);}
+.fi::placeholder{color:var(--t4);}
+.ftx{resize:vertical;min-height:70px;}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.di{background:var(--bg);border-radius:var(--r2);padding:12px;}
+.dil{font-size:10px;font-family:var(--mono);color:var(--t3);margin-bottom:3px;text-transform:uppercase;}
+.div2{font-size:13px;font-weight:700;}
+.dl{display:flex;flex-direction:column;gap:5px;}
+.ditem{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r2);}
+.ditem.ok{border-color:#bbf7d0;background:#f0fdf4;}
+.empty{text-align:center;padding:48px 20px;color:var(--t3);}
+.loading{text-align:center;padding:40px;}
+.spinner{width:28px;height:28px;border:3px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.toasts{position:fixed;bottom:18px;right:18px;z-index:1000;display:flex;flex-direction:column;gap:7px;}
+.toast{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r2);padding:11px 15px;display:flex;align-items:center;gap:9px;min-width:240px;font-size:13px;box-shadow:var(--shadow2);animation:tin .25s ease;}
+@keyframes tin{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.tok{border-left:4px solid var(--green);}
+.toast.twrn{border-left:4px solid var(--amber);}
+.toast.terr{border-left:4px solid var(--rose);}
+.toast.tinf{border-left:4px solid var(--blue);}
+.mob-btn{display:none;width:34px;height:34px;border-radius:8px;background:var(--surface);border:1.5px solid var(--border);cursor:pointer;align-items:center;justify-content:center;font-size:16px;}
+.sov{display:none;position:fixed;inset:0;background:rgba(26,46,37,.5);z-index:190;}
+@media(max-width:960px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sov.show{display:block}.main{margin-left:0}.mob-btn{display:flex}.stats{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.fg{grid-template-columns:1fr}.dg{grid-template-columns:1fr}.content{padding:16px}}
+@media(max-width:520px){.stats{grid-template-columns:1fr}}
+.fade-in{animation:fi .25s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+
+</head>
+<body>
+<div class="app">
+<div class="sov" id="sov" onclick="closeSide()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-icon"><svg viewBox="0 0 22 22" fill="none"><path d="M2 11 L6 11 L8 5 L11 17 L14 8 L16 11 L20 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><div class="sb-name">VITAGEST</div><div class="sb-sub">Gestão de Pessoas</div></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-lbl">Módulos</div>
+    <button class="nb active" onclick="go('banco')">👥 Banco de Talentos <span class="nbadge" id="nb1">0</span></button>
+    <button class="nb" onclick="go('admissao')">🔄 Admissões <span class="nbadge amber" id="nb2">0</span></button>
+    <button class="nb" onclick="go('colaboradores')">🏢 Colaboradores</button>
+    <button class="nb" onclick="go('vagas')">💼 Vagas <span class="nbadge red" id="nb3">0</span></button>
+    <div class="nav-lbl" style="margin-top:8px">Sistema</div>
+    <button class="nb" onclick="go('config')">⚙️ Configurações</button>
+  </nav>
+  <div class="sb-user">
+    <div class="u-av">VG</div>
+    <div><div class="u-nm">Vitagest</div><div class="u-rl">Administrador</div></div>
+  </div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <button class="mob-btn" onclick="openSide()">☰</button>
+    <div class="tb-title" id="tbt">Banco de Talentos</div>
+    <div class="sync"><div class="dot off" id="sdot"></div><span id="stxt">Conectando...</span></div>
+    <button class="btn btn-o btn-sm" onclick="syncAll()">🔄 Sincronizar</button>
+    <button class="btn btn-g btn-sm" id="btnadd" onclick="openNewCand()">+ Candidato</button>
+  </div>
+  <div class="content" id="pg"></div>
+</main>
+</div>
+
+<!-- MODALS -->
+
+<div class="ov" id="mC"><div class="mod"><div class="mh"><div class="mt" id="mCt">Novo Candidato</div><button class="mx" onclick="closeM('mC')">✕</button></div><div class="mb" id="mCb"></div><div class="mf" id="mCf"></div></div></div>
+<div class="ov" id="mD"><div class="mod" style="max-width:700px"><div class="mh"><div class="mt" id="mDt">Perfil</div><button class="mx" onclick="closeM('mD')">✕</button></div><div class="mb" id="mDb"></div><div class="mf" id="mDf"></div></div></div>
+<div class="ov" id="mA"><div class="mod" style="max-width:480px"><div class="mh"><div class="mt">✅ Aprovar para Contratação</div><button class="mx" onclick="closeM('mA')">✕</button></div><div class="mb" id="mAb"></div><div class="mf"><button class="btn btn-o" onclick="closeM('mA')">Cancelar</button><button class="btn btn-g" onclick="confirmarAprov()">✅ Confirmar</button></div></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ══════════════════════════════════════
+// SUPABASE CONFIG
+// ══════════════════════════════════════
+const SUPA_URL = 'https://nanynbwmivtyopinptfr.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbnluYndtaXZ0eW9waW5wdGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NjU3ODYsImV4cCI6MjA5MzM0MTc4Nn0.T9hLvQcRJ8Gsa9uUVeMrQ4K7qkL1Ib3ZDoY0eRYoD2Q';
+const HEADERS = {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
+
+function sbFetch(path, opts) {
+  return fetch(SUPA_URL + '/rest/v1/' + path, Object.assign({headers: HEADERS}, opts)).then(function(r){return r.json();});
+}
+
+const db = {
+  from: function(table) {
+    return {
+      select: function(cols) {
+        cols = cols || '*';
+        return {
+          order: function(col, opts) {
+            opts = opts || {};
+            var dir = opts.ascending === false ? 'desc' : 'asc';
+            return sbFetch(table + '?select=' + cols + '&order=' + col + '.' + dir)
+              .then(function(data){return {data: data, error: null};})
+              .catch(function(e){return {data: [], error: e};});
+          }
+        };
+      },
+      insert: function(rows) {
+        return {
+          select: function() {
+            return sbFetch(table, {method: 'POST', body: JSON.stringify(rows[0])})
+              .then(function(data){return {data: Array.isArray(data)?data:[data], error: null};})
+              .catch(function(e){return {data: [], error: e};});
+          }
+        };
+      },
+      update: function(data) {
+        return {
+          eq: function(col, val) {
+            return sbFetch(table + '?' + col + '=eq.' + val, {method: 'PATCH', body: JSON.stringify(data)})
+              .then(function(){return {error: null};})
+              .catch(function(e){return {error: e};});
+          }
+        };
+      }
+    };
+  }
+};
+
+let cache = {candidatos:[],admissoes:[],colaboradores:[],vagas:[]};
+let curPage = 'banco';
+let approvId = null;
+
+// ══════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════
+function setSS(s) {
+  const dot=document.getElementById('sdot'),txt=document.getElementById('stxt');
+  if(!dot)return;
+  dot.className='dot'+(s==='ok'?'':s==='loading'?' loading':' off');
+  txt.textContent=s==='ok'?'Sincronizado':s==='loading'?'Salvando...':'Offline';
+}
+
+async function syncAll() {
+  setSS('loading');
+  try {
+    const [c,a,co,v] = await Promise.all([
+      db.from('candidatos').select('*').order('id',{ascending:false}),
+      db.from('admissoes').select('*').order('id',{ascending:false}),
+      db.from('colaboradores').select('*').order('id',{ascending:false}),
+      db.from('vagas').select('*').order('id',{ascending:false}),
+    ]);
+    cache.candidatos = c.data||[];
+    cache.admissoes = a.data||[];
+    cache.colaboradores = co.data||[];
+    cache.vagas = v.data||[];
+    setSS('ok');
+    updateBadges();
+    renderPage();
+  } catch(e) {
+    setSS('err');
+    toast('Erro ao sincronizar: '+e.message,'terr');
+  }
+}
+
+// ══════════════════════════════════════
+// NAVEGAÇÃO
+// ══════════════════════════════════════
+function go(p) {
+  curPage=p;
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const m={banco:0,admissao:1,colaboradores:2,vagas:3,config:4};
+  const btns=document.querySelectorAll('.nb');
+  if(btns[m[p]])btns[m[p]].classList.add('active');
+  const ab=document.getElementById('btnadd');
+  if(ab){if(p==='banco'){ab.textContent='+ Candidato';ab.onclick=openNewCand;ab.style.display='';}else if(p==='vagas'){ab.textContent='+ Vaga';ab.onclick=openNewVaga;ab.style.display='';}else ab.style.display='none';}
+  closeSide();
+  renderPage();
+}
+
+function renderPage(){({banco:pgBanco,admissao:pgAdm,colaboradores:pgColab,vagas:pgVagas,config:pgConfig}[curPage]||pgBanco)();}
+
+// ══════════════════════════════════════
+// BANCO DE TALENTOS
+// ══════════════════════════════════════
+function pgBanco() {
+  document.getElementById('tbt').textContent='Banco de Talentos';
+  const c=cache.candidatos;
+  document.getElementById('pg').innerHTML=`
+  <div class="fade-in">
+  <div class="ph"><div><div class="ph-eye">RH / Recrutamento</div><div class="ph-t">Banco de Talentos</div><div class="ph-d">Gerencie candidatos e aprove para contratação — dados em tempo real no Supabase</div></div>
+  <div class="ph-a"><button class="btn btn-o btn-sm" onclick="openLinkInfo()">🔗 Link Candidatos</button><button class="btn btn-g btn-sm" onclick="openNewCand()">+ Novo Candidato</button></div></div>
+  <div class="stats">
+    <div class="stat"><div class="st-l">Total</div><div class="st-n" style="color:var(--green)">${c.length}</div><div class="st-f">no banco</div></div>
+    <div class="stat"><div class="st-l">Novos</div><div class="st-n" style="color:var(--blue)">${c.filter(x=>x.status==='novo').length}</div><div class="st-f">aguardando</div></div>
+    <div class="stat"><div class="st-l">Em análise</div><div class="st-n" style="color:var(--amber)">${c.filter(x=>x.status==='analise').length}</div><div class="st-f">em avaliação</div></div>
+    <div class="stat"><div class="st-l">Score alto</div><div class="st-n" style="color:var(--violet)">${c.filter(x=>Number(x.score)>=80).length}</div><div class="st-f">score ≥ 80</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="srch"><input id="sq" placeholder="Buscar nome, cargo, cidade..." oninput="filtrar()"></div>
+    <select class="fsel" id="fc" onchange="filtrar()"><option value="">Todos cargos</option>${[...new Set(c.map(x=>x.cargo).filter(Boolean))].map(x=>`<option value="${x}">${x}</option>`).join('')}</select>
+    <select class="fsel" id="fci" onchange="filtrar()"><option value="">Todas cidades</option>${[...new Set(c.map(x=>x.cidade).filter(Boolean))].map(x=>`<option value="${x}">${x}</option>`).join('')}</select>
+    <select class="fsel" id="fs" onchange="filtrar()"><option value="">Todos status</option><option value="novo">Novos</option><option value="analise">Em análise</option><option value="aprovado">Aprovados</option></select>
+  </div>
+  <div id="cout">${renderCards(c)}</div></div>`;
+}
+
+function filtrar(){
+  const q=(document.getElementById('sq')?.value||'').toLowerCase();
+  const fc=document.getElementById('fc')?.value||'';
+  const fci=document.getElementById('fci')?.value||'';
+  const fs=document.getElementById('fs')?.value||'';
+  const list=cache.candidatos.filter(c=>(!q||[c.nome,c.cargo,c.cidade].some(x=>(x||'').toLowerCase().includes(q)))&&(!fc||c.cargo===fc)&&(!fci||c.cidade===fci)&&(!fs||c.status===fs));
+  const o=document.getElementById('cout');if(o)o.innerHTML=renderCards(list);
+}
+
+function renderCards(list){
+  if(!list.length)return'<div class="empty">🔍 Nenhum candidato encontrado</div>';
+  return`<div class="grid">${list.map(cardH).join('')}</div>`;
+}
+
+function cardH(c){
+  const s=Number(c.score)||0,sc=s>=80?'a':s>=60?'m':'b',sq=s>=80?'sca':s>=60?'scm':'scb';
+  const docs=toArr(c.docs);
+  return`<div class="card c${sc}" onclick="openDetail(${c.id})">
+  <div class="ch"><div class="av">${ini(c.nome)}</div><div style="flex:1"><div class="cn">${c.nome||'—'}</div><div class="cc">${c.cargo||'—'}</div></div><div class="sc ${sq}">${s}</div></div>
+  <div class="ci"><div class="cii">📍 ${c.cidade||'—'}</div><div class="cii">🎓 ${escL(c.escolaridade)}</div><div class="cii">⚡ ${dispL(c.disponibilidade)}</div><div class="cii">💰 R$ ${fmt(c.pretensao)}</div></div>
+  <div class="tags"><span class="sp ${spC(c.status)}">${spL(c.status)}</span>${docs.length?`<span class="tag tg-g">${docs.length} docs</span>`:'<span class="tag tg-r">sem docs</span>'}${s>=80?'<span class="tag tg-b">⭐ Destaque</span>':''}</div>
+  <div class="cf"><button class="btn btn-o btn-sm" onclick="event.stopPropagation();openDetail(${c.id})">Ver perfil</button>
+  ${c.status!=='aprovado'&&c.status!=='contratado'?`<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openAprov(${c.id})">✅ Aprovar</button>`:'<span class="tag tg-g" style="display:flex;align-items:center;justify-content:center;flex:1">✅ Aprovado</span>'}</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// ADMISSÕES
+// ══════════════════════════════════════
+function pgAdm(){
+  document.getElementById('tbt').textContent='Admissões';
+  const etapas=[{k:'aprovado',l:'Aprovado',c:'var(--green)'},{k:'docs_pendentes',l:'Docs Pendentes',c:'var(--rose)'},{k:'enviado_contabilidade',l:'Contabilidade',c:'var(--amber)'},{k:'assinando_contrato',l:'Assinatura',c:'var(--violet)'},{k:'ativo',l:'Ativo ✓',c:'#059669'}];
+  const cols=etapas.map(e=>{
+    const cards=cache.admissoes.filter(a=>a.etapa===e.k);
+    const ch=cards.map(a=>{
+      const cand=cache.candidatos.find(x=>x.id===a.candidato_id);
+      const pend=toArr(a.docs_pend),ok=toArr(a.docs_ok);
+      const tel=cand?(cand.telefone||'').replace(/\D/g,''):'';
+      const msg=encodeURIComponent(`Olá ${a.nome}! Sua admissão na Vitagest está em andamento.${pend.length?' Docs necessários: '+pend.join(', '):'  Documentos completos!'}`);
+      const prog={aprovado:20,docs_pendentes:40,enviado_contabilidade:60,assinando_contrato:80,ativo:100}[a.etapa]||0;
+      return`<div class="kcard" onclick="openAdmD(${a.id})"><div class="kn">${a.nome}</div><div class="kr">${a.cargo}</div><div class="km"><span>${a.data_aprovacao||'—'}</span><span>${ok.length} docs ✓</span></div>${pend.length?`<div class="kpd">⚠ ${pend.length} pendente${pend.length>1?'s':''}</div>`:''}${tel?`<a class="kwpp" href="https://wa.me/55${tel}?text=${msg}" target="_blank" onclick="event.stopPropagation()">💬 WhatsApp</a>`:''}
+      <div class="kprog"><div class="kpf" style="width:${prog}%;background:${e.c}"></div></div></div>`;
+    }).join('')||'<div style="text-align:center;padding:16px;color:var(--t3);font-size:11px">vazio</div>';
+    return`<div class="kol"><div class="kh"><div class="kt" style="color:${e.c}">${e.l}</div><div class="kc">${cards.length}</div></div><div class="kb">${ch}</div></div>`;
+  }).join('');
+  document.getElementById('pg').innerHTML=`<div class="fade-in">
+  <div class="ph"><div><div class="ph-eye">RH / Admissão</div><div class="ph-t">Admissões em Andamento</div><div class="ph-d">Dados em tempo real — sincronizados automaticamente</div></div></div>
+  <div class="kanban">${cols}</div>
+  <div style="margin-top:14px;padding:12px 16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:var(--r2);font-size:12px;color:var(--t2)"><strong style="color:var(--green)">💬 WhatsApp gratuito:</strong> botão abre o app com mensagem pronta — sem custo.</div></div>`;
+}
+
+// ══════════════════════════════════════
+// COLABORADORES
+// ══════════════════════════════════════
+function pgColab(){
+  document.getElementById('tbt').textContent='Colaboradores';
+  document.getElementById('pg').innerHTML=`<div class="fade-in">
+  <div class="ph"><div><div class="ph-eye">RH / Equipe</div><div class="ph-t">Colaboradores Ativos</div></div><div class="ph-a"><button class="btn btn-g btn-sm" onclick="go('banco')">+ Contratar</button></div></div>
+  ${cache.colaboradores.length?`<div class="tw"><table><thead><tr><th>Nome</th><th>Cargo</th><th>Cidade</th><th>Admissão</th><th>Salário</th><th>Status</th></tr></thead><tbody>
+  ${cache.colaboradores.map(c=>`<tr><td>${c.nome}</td><td>${c.cargo}</td><td>${c.cidade||'—'}</td><td>${c.data_admissao||'—'}</td><td>R$ ${fmt(c.salario)}</td><td><span class="sp sp-ap">● Ativo</span></td></tr>`).join('')}</tbody></table></div>`:
+  '<div class="empty">🏢 Nenhum colaborador ainda</div>'}
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// VAGAS
+// ══════════════════════════════════════
+function pgVagas(){
+  document.getElementById('tbt').textContent='Vagas';
+  document.getElementById('pg').innerHTML=`<div class="fade-in">
+  <div class="ph"><div><div class="ph-eye">RH / Recrutamento</div><div class="ph-t">Vagas Abertas</div></div><div class="ph-a"><button class="btn btn-g btn-sm" onclick="openNewVaga()">+ Nova Vaga</button></div></div>
+  ${cache.vagas.length?`<div class="grid">${cache.vagas.map(v=>{const n=cache.candidatos.filter(c=>c.cargo===v.cargo&&c.cidade===v.cidade).length;return`<div class="card cm" style="cursor:default"><div class="ch"><div class="av" style="background:#eff6ff;color:#1d6fa4">💼</div><div><div class="cn">${v.cargo}</div><div class="cc" style="color:var(--blue)">${v.cidade} · ${v.qtd||1} vaga${v.qtd>1?'s':''}</div></div></div><div class="ci"><div class="cii" style="grid-column:1/-1">${v.descricao||'—'}</div></div><div class="tags"><span class="tag tg-g">${n} compatível${n!==1?'is':''}</span></div><div class="cf"><button class="btn btn-o btn-sm" onclick="filtrarV('${v.cargo}','${v.cidade}')">Ver candidatos</button></div></div>`;}).join('')}</div>`:
+  '<div class="empty">💼 Nenhuma vaga ainda</div>'}
+  </div>`;
+}
+
+function filtrarV(cargo,cidade){go('banco');setTimeout(()=>{const fc=document.getElementById('fc'),fci=document.getElementById('fci');if(fc)fc.value=cargo;if(fci)fci.value=cidade;filtrar();},80);}
+
+// ══════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════
+function pgConfig(){
+  document.getElementById('tbt').textContent='Configurações';
+  document.getElementById('pg').innerHTML=`<div class="fade-in">
+  <div class="ph"><div><div class="ph-eye">Sistema</div><div class="ph-t">Configurações</div></div></div>
+  <div class="tw" style="padding:22px;margin-bottom:16px">
+    <div class="fst" style="margin-bottom:14px">Empresa</div>
+    <div class="fg" style="gap:12px">
+      <div class="fg2"><label class="fl">Razão Social</label><input class="fi" id="cfg-rs" value="${localStorage.getItem('cfg_rs')||'Vitagest'}" placeholder="Razão Social"></div>
+      <div class="fg2"><label class="fl">CNPJ</label><input class="fi" id="cfg-cnpj" value="${localStorage.getItem('cfg_cnpj')||''}" placeholder="00.000.000/0001-00"></div>
+      <div class="fg2"><label class="fl">Responsável RH</label><input class="fi" id="cfg-rh" value="${localStorage.getItem('cfg_rh')||''}" placeholder="Nome"></div>
+      <div class="fg2"><label class="fl">WhatsApp Empresa</label><input class="fi" id="cfg-wpp" value="${localStorage.getItem('cfg_wpp')||''}" placeholder="51 9 0000-0000"></div>
+    </div>
+    <button class="btn btn-g btn-sm" style="margin-top:14px" onclick="salvarCfg()">💾 Salvar</button>
+  </div>
+  <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:var(--r);padding:20px">
+    <div class="fst" style="margin-bottom:10px;color:var(--green)">✅ Conexão com Supabase</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:10px">Seus dados estão salvos em tempo real no banco de dados Supabase.</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--green);background:var(--green2);padding:8px 12px;border-radius:8px">${SUPA_URL}</div>
+  </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// NOVO CANDIDATO
+// ══════════════════════════════════════
+function openNewCand(){
+  document.getElementById('mCt').textContent='Novo Candidato';
+  document.getElementById('mCb').innerHTML=formC({});
+  document.getElementById('mCf').innerHTML='<button class="btn btn-o" onclick="closeM(\'mC\')">Cancelar</button><button class="btn btn-g" onclick="saveC()">💾 Salvar no Supabase</button>';
+  openM('mC');
+}
+
+function formC(c){return`
+<div class="fs"><div class="fst">Dados Pessoais</div><div class="fg">
+<div class="fg2 ff"><label class="fl">Nome completo *</label><input class="fi" id="fn" value="${c.nome||''}" placeholder="Nome completo"></div>
+<div class="fg2"><label class="fl">CPF *</label><input class="fi" id="fc2" value="${c.cpf||''}" placeholder="000.000.000-00"></div>
+<div class="fg2"><label class="fl">RG</label><input class="fi" id="frg" value="${c.rg||''}" placeholder="0000000"></div>
+<div class="fg2"><label class="fl">Nascimento</label><input class="fi" id="fna" type="date" value="${c.nascimento||''}"></div>
+<div class="fg2"><label class="fl">Estado Civil</label><select class="fse" id="fec">${['solteiro','casado','divorciado','viuvo'].map(o=>`<option value="${o}" ${c.estadocivil===o?'selected':''}>${o.charAt(0).toUpperCase()+o.slice(1)}</option>`).join('')}</select></div>
+<div class="fg2"><label class="fl">Filhos</label><input class="fi" id="ffi" type="number" min="0" value="${c.filhos||0}"></div>
+</div></div>
+<div class="fs"><div class="fst">Contato</div><div class="fg">
+<div class="fg2"><label class="fl">WhatsApp *</label><input class="fi" id="ft" value="${c.telefone||''}" placeholder="51 9 0000-0000"></div>
+<div class="fg2"><label class="fl">E-mail</label><input class="fi" id="fe" value="${c.email||''}" placeholder="email@exemplo.com"></div>
+<div class="fg2 ff"><label class="fl">Endereço</label><input class="fi" id="fen" value="${c.endereco||''}" placeholder="Rua, número, bairro"></div>
+<div class="fg2"><label class="fl">Cidade *</label><input class="fi" id="fci2" value="${c.cidade||''}" placeholder="Cidade"></div>
+<div class="fg2"><label class="fl">Estado</label><select class="fse" id="fest">${['RS','SC','PR','SP','RJ','MG','BA','PE','CE','GO','AM'].map(e=>`<option ${c.estado===e?'selected':''}>${e}</option>`).join('')}</select></div>
+</div></div>
+<div class="fs"><div class="fst">Profissional</div><div class="fg">
+<div class="fg2"><label class="fl">Cargo *</label><input class="fi" id="fca" value="${c.cargo||''}" placeholder="Técnico de Enfermagem"></div>
+<div class="fg2"><label class="fl">Escolaridade</label><select class="fse" id="fesc">${[['medio_completo','Médio Completo'],['tecnico_completo','Técnico'],['superior_completo','Superior'],['pos_graduacao','Pós-Graduação']].map(([v,l])=>`<option value="${v}" ${c.escolaridade===v?'selected':''}>${l}</option>`).join('')}</select></div>
+<div class="fg2"><label class="fl">Disponibilidade</label><select class="fse" id="fdi">${[['imediata','Imediata'],['7_dias','7 dias'],['15_dias','15 dias'],['30_dias','30 dias']].map(([v,l])=>`<option value="${v}" ${c.disponibilidade===v?'selected':''}>${l}</option>`).join('')}</select></div>
+<div class="fg2"><label class="fl">Pretensão (R$)</label><input class="fi" id="fpr" value="${c.pretensao||''}" placeholder="2500"></div>
+<div class="fg2 ff"><label class="fl">Experiências *</label><textarea class="ftx" id="fex">${c.experiencias||''}</textarea></div>
+
+</div></div>`;}
+
+async function saveC(){
+const nome=v(‘fn’),cpf=v(‘fc2’),tel=v(‘ft’),cargo=v(‘fca’),cidade=v(‘fci2’);
+if(!nome||!cpf||!cargo||!cidade){toast(‘Preencha os campos obrigatórios (*)’,‘twrn’);return;}
+const esc=v(‘fesc’);
+let score=50+({pos_graduacao:20,superior_completo:18,tecnico_completo:12,medio_completo:5}[esc]||0);
+if((v(‘fex’)||’’).length>100)score+=15;if(v(‘fdi’)===‘imediata’)score+=8;if(tel)score+=5;
+score=Math.min(99,Math.max(30,score));
+const dados={nome,cpf,rg:v(‘frg’),nascimento:v(‘fna’),telefone:tel,email:v(‘fe’),endereco:v(‘fen’),cidade,estado:v(‘fest’),estadocivil:v(‘fec’),filhos:parseInt(v(‘ffi’))||0,escolaridade:esc,experiencias:v(‘fex’),cargo,disponibilidade:v(‘fdi’),pretensao:v(‘fpr’),status:‘novo’,score,docs:’[]’,origem:‘sistema’};
+try{
+const {data,error}=await db.from(‘candidatos’).insert([dados]).select();
+if(error)throw error;
+cache.candidatos.unshift(data[0]);
+closeM(‘mC’);updateBadges();renderPage();
+toast(`✅ ${nome} salvo no banco de dados! Score: ${score}`,‘tok’);
+}catch(e){toast(’Erro: ’+e.message,‘terr’);}
+}
+
+// ══════════════════════════════════════
+// DETALHE CANDIDATO
+// ══════════════════════════════════════
+function openDetail(id){
+const c=cache.candidatos.find(x=>x.id===id);if(!c)return;
+const docs=toArr(c.docs);const s=Number(c.score)||0;
+const sc=s>=80?‘var(–green)’:s>=60?‘var(–amber)’:‘var(–t3)’;
+const wnum=(c.telefone||’’).replace(/\D/g,’’);
+const wmsg=encodeURIComponent(`Olá ${c.nome}! A Vitagest está analisando seu perfil para ${c.cargo}.`);
+const docsAll=[{k:‘rg’,l:‘RG’},{k:‘cpf’,l:‘CPF’},{k:‘cnh’,l:‘CNH’},{k:‘residencia’,l:‘Residência’},{k:‘ctps’,l:‘CTPS’},{k:‘pis’,l:‘PIS’},{k:‘foto’,l:‘Foto’},{k:‘banco’,l:‘Dados Bancários’},{k:‘coren’,l:‘COREN’},{k:‘diploma’,l:‘Diploma’}];
+document.getElementById(‘mDt’).textContent=c.nome;
+document.getElementById(‘mDb’).innerHTML=`
+
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:14px;background:var(--bg);border-radius:var(--r2)">
+  <div style="width:56px;height:56px;border-radius:50%;background:var(--green2);border:3px solid ${sc};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:var(--green)">${ini(c.nome)}</div>
+  <div style="flex:1"><div style="font-size:18px;font-weight:800">${c.nome}</div><div style="color:var(--green);font-size:13px">${c.cargo}</div>
+  <div style="display:flex;gap:7px;margin-top:7px"><span class="sp ${spC(c.status)}">${spL(c.status)}</span><span style="font-family:var(--mono);font-size:10px;color:${sc};padding:2px 8px;border-radius:20px;background:var(--surface);border:1.5px solid var(--border)">Score: ${s}</span></div></div>
+  <div style="text-align:center;background:var(--surface);padding:10px 14px;border-radius:var(--r2);border:1.5px solid var(--border)"><div style="font-family:var(--mono);font-size:28px;color:${sc}">${s}</div><div style="font-size:9px;color:var(--t3)">SCORE IA</div></div></div>
+  <div class="dg">
+  <div class="di"><div class="dil">WhatsApp</div><div class="div2">${c.telefone||'—'}</div></div>
+  <div class="di"><div class="dil">E-mail</div><div class="div2" style="font-size:12px">${c.email||'—'}</div></div>
+  <div class="di"><div class="dil">Cidade</div><div class="div2">${c.cidade||'—'} · ${c.estado||''}</div></div>
+  <div class="di"><div class="dil">Disponível</div><div class="div2">${dispL(c.disponibilidade)}</div></div>
+  <div class="di"><div class="dil">Pretensão</div><div class="div2">R$ ${fmt(c.pretensao)}</div></div>
+  <div class="di"><div class="dil">Escolaridade</div><div class="div2">${escL(c.escolaridade)}</div></div></div>
+  <div style="background:var(--bg);border-radius:var(--r2);padding:12px;margin-bottom:14px"><div style="font-size:9px;color:var(--t3);margin-bottom:4px;font-family:var(--mono);text-transform:uppercase">Experiências</div><div style="font-size:13px;line-height:1.6">${c.experiencias||'Não informado'}</div></div>
+  <div style="font-size:10px;color:var(--green);margin-bottom:8px;font-family:var(--mono);text-transform:uppercase">📁 Documentos (${docs.length} recebidos)</div>
+  <div class="dl">${docsAll.map(d=>{const ok=docs.includes(d.k);return`<div class="ditem ${ok?'ok':''}"><div>${ok?'✅':'📄'}</div><div style="flex:1;font-size:13px">${d.l}</div><div style="font-size:10px;font-family:var(--mono);color:${ok?'var(--green)':'var(--t3)'}">${ok?'Recebido':'Pendente'}</div></div>`;}).join('')}</div>`;
+  document.getElementById('mDf').innerHTML=`
+  ${wnum?`<a class="btn btn-o btn-sm" href="https://wa.me/55${wnum}?text=${wmsg}" target="_blank" style="text-decoration:none">💬 WhatsApp</a>`:''}
+  <button class="btn btn-d btn-sm" onclick="recusar(${c.id})">✕ Recusar</button>
+  <button class="btn btn-g btn-sm" onclick="closeM('mD');openAprov(${c.id})">✅ Aprovar</button>`;
+  openM('mD');
+}
+
+async function recusar(id){
+try{
+await db.from(‘candidatos’).update({status:‘recusado’}).eq(‘id’,id);
+const c=cache.candidatos.find(x=>x.id===id);if(c)c.status=‘recusado’;
+closeM(‘mD’);renderPage();updateBadges();toast(‘Candidato recusado’,‘twrn’);
+}catch(e){toast(’Erro: ’+e.message,‘terr’);}
+}
+
+// ══════════════════════════════════════
+// APROVAR
+// ══════════════════════════════════════
+function openAprov(id){
+const c=cache.candidatos.find(x=>x.id===id);if(!c)return;approvId=id;
+const wnum=(c.telefone||’’).replace(/\D/g,’’);
+const wmsg=encodeURIComponent(`Olá ${c.nome}! 🎉 Você foi aprovado(a) para ${c.cargo} na Vitagest! Em breve entraremos em contato.`);
+document.getElementById(‘mAb’).innerHTML=`
+
+  <div style="text-align:center;padding:14px 0 18px"><div style="font-size:44px;margin-bottom:8px">🎉</div>
+  <div style="font-size:18px;font-weight:800">${c.nome}</div>
+  <div style="color:var(--green);font-size:13px;margin-top:3px">${c.cargo} · ${c.cidade}</div></div>
+  <div style="background:var(--bg);border-radius:var(--r2);padding:14px;margin-bottom:14px">
+  ${['✅ Atualiza status para aprovado','📋 Cria processo de admissão','💾 Salva em tempo real no Supabase'].map(t=>`<div style="font-size:13px;margin-bottom:5px">${t}</div>`).join('')}</div>
+  ${wnum?`<div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:var(--r2);padding:12px">
+  <div style="font-size:10px;color:var(--green);margin-bottom:7px;font-family:var(--mono)">💬 NOTIFICAR VIA WHATSAPP</div>
+  <a class="btn btn-g btn-sm" href="https://wa.me/55${wnum}?text=${wmsg}" target="_blank" style="text-decoration:none">💬 Enviar WhatsApp</a></div>`:''}`;
+  openM('mA');
+}
+
+async function confirmarAprov(){
+const c=cache.candidatos.find(x=>x.id===approvId);if(!c)return;
+try{
+await db.from(‘candidatos’).update({status:‘aprovado’}).eq(‘id’,approvId);
+c.status=‘aprovado’;
+const docs=toArr(c.docs);
+const pend=[‘rg’,‘cpf’,‘residencia’,‘ctps’,‘pis’,‘foto’,‘banco’].filter(d=>!docs.includes(d));
+const {data}=await db.from(‘admissoes’).insert([{candidato_id:c.id,nome:c.nome,cargo:c.cargo,etapa:‘aprovado’,data_aprovacao:today(),docs_ok:JSON.stringify(docs),docs_pend:JSON.stringify(pend),obs:’’}]).select();
+if(data)cache.admissoes.unshift(data[0]);
+closeM(‘mA’);updateBadges();renderPage();
+toast(`✅ ${c.nome} aprovado! Processo criado.`,‘tok’);
+setTimeout(()=>toast(‘💬 Não esqueça de enviar o WhatsApp!’,‘tinf’),1800);
+}catch(e){toast(’Erro: ’+e.message,‘terr’);}
+}
+
+// ══════════════════════════════════════
+// DETALHE ADMISSÃO
+// ══════════════════════════════════════
+function openAdmD(id){
+const a=cache.admissoes.find(x=>x.id===id);if(!a)return;
+const cand=cache.candidatos.find(x=>x.id===a.candidato_id);
+const pend=toArr(a.docs_pend),ok=toArr(a.docs_ok);
+const etapas=[‘aprovado’,‘docs_pendentes’,‘enviado_contabilidade’,‘assinando_contrato’,‘ativo’];
+const etL={aprovado:‘Aprovado’,docs_pendentes:‘Docs Pendentes’,enviado_contabilidade:‘Contabilidade’,assinando_contrato:‘Assinatura’,ativo:‘Ativo’};
+const idx=etapas.indexOf(a.etapa);
+const tel=cand?(cand.telefone||’’).replace(/\D/g,’’):’’;
+const msg=encodeURIComponent(`Olá ${a.nome}! Atualização do processo Vitagest.${pend.length?' Docs necessários: '+pend.join(', '):''}`);
+document.getElementById(‘mDt’).textContent=’Admissão — ’+a.nome;
+document.getElementById(‘mDb’).innerHTML=`
+
+  <div style="display:flex;gap:5px;margin-bottom:18px;overflow-x:auto">
+  ${etapas.map((e,i)=>`<div style="flex:1;min-width:65px;text-align:center"><div style="width:26px;height:26px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:${i<=idx?'var(--green)':'var(--border)'};color:${i<=idx?'#fff':'var(--t3)'}">${i+1}</div><div style="font-size:9px;font-family:var(--mono);color:${i===idx?'var(--green)':'var(--t3)'}">${etL[e]}</div></div>`).join('')}</div>
+  <div class="dg">
+  <div class="di"><div class="dil">Cargo</div><div class="div2">${a.cargo}</div></div>
+  <div class="di"><div class="dil">Aprovado em</div><div class="div2">${a.data_aprovacao||'—'}</div></div>
+  <div class="di"><div class="dil">Docs OK</div><div class="div2" style="color:var(--green)">${ok.length}</div></div>
+  <div class="di"><div class="dil">Pendentes</div><div class="div2" style="color:${pend.length?'var(--rose)':'var(--green)'}">${pend.length||'✓'}</div></div></div>
+  <div style="font-size:10px;color:var(--t3);margin-bottom:8px;font-family:var(--mono);text-transform:uppercase">Avançar etapa:</div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap">${etapas.filter((_,i)=>i>idx).map(e=>`<button class="btn btn-o btn-sm" onclick="avancar(${a.id},'${e}')">${etL[e]} →</button>`).join('')}</div>`;
+  document.getElementById('mDf').innerHTML=`${tel?`<a class="btn btn-g btn-sm" href="https://wa.me/55${tel}?text=${msg}" target="_blank" style="text-decoration:none">💬 WhatsApp</a>`:''}
+  <button class="btn btn-o" onclick="closeM('mD')">Fechar</button>`;
+  openM('mD');
+}
+
+async function avancar(admId,novaEtapa){
+try{
+await db.from(‘admissoes’).update({etapa:novaEtapa}).eq(‘id’,admId);
+const a=cache.admissoes.find(x=>x.id===admId);if(a)a.etapa=novaEtapa;
+if(novaEtapa===‘ativo’){
+const cand=cache.candidatos.find(x=>x.id===a?.candidato_id);
+if(cand){
+await db.from(‘candidatos’).update({status:‘contratado’}).eq(‘id’,cand.id);
+cand.status=‘contratado’;
+const {data}=await db.from(‘colaboradores’).insert([{nome:a.nome,cargo:a.cargo,cidade:cand.cidade,data_admissao:today(),salario:cand.pretensao,status:‘ativo’,candidato_id:cand.id}]).select();
+if(data)cache.colaboradores.push(data[0]);
+}
+}
+closeM(‘mD’);updateBadges();renderPage();toast(`✅ Etapa: ${novaEtapa.replace(/_/g,' ')}`,‘tok’);
+}catch(e){toast(’Erro: ’+e.message,‘terr’);}
+}
+
+// ══════════════════════════════════════
+// NOVA VAGA
+// ══════════════════════════════════════
+function openNewVaga(){
+document.getElementById(‘mCt’).textContent=‘Nova Vaga’;
+document.getElementById(‘mCb’).innerHTML=`<div class="fg"><div class="fg2 ff"><label class="fl">Cargo *</label><input class="fi" id="vc" placeholder="Cargo"></div><div class="fg2"><label class="fl">Cidade *</label><input class="fi" id="vci" placeholder="Cidade"></div><div class="fg2"><label class="fl">Vagas</label><input class="fi" id="vq" type="number" value="1"></div><div class="fg2 ff"><label class="fl">Descrição</label><textarea class="ftx" id="vd"></textarea></div></div>`;
+document.getElementById(‘mCf’).innerHTML=’<button class="btn btn-o" onclick="closeM(\'mC\')">Cancelar</button><button class="btn btn-g" onclick="saveV()">💾 Criar</button>’;
+openM(‘mC’);
+}
+
+async function saveV(){
+const cargo=v(‘vc’),cidade=v(‘vci’);
+if(!cargo||!cidade){toast(‘Preencha cargo e cidade’,‘twrn’);return;}
+try{
+const {data}=await db.from(‘vagas’).insert([{cargo,cidade,qtd:parseInt(v(‘vq’))||1,status:‘aberta’,descricao:v(‘vd’)}]).select();
+if(data)cache.vagas.push(data[0]);
+closeM(‘mC’);updateBadges();renderPage();toast(`✅ Vaga criada!`,‘tok’);
+}catch(e){toast(’Erro: ’+e.message,‘terr’);}
+}
+
+// ══════════════════════════════════════
+// LINK INFO
+// ══════════════════════════════════════
+function openLinkInfo(){
+document.getElementById(‘mCt’).textContent=‘Link para Candidatos’;
+document.getElementById(‘mCb’).innerHTML=`<div style="text-align:center;padding:14px 0 18px">
+
+  <div style="font-size:48px;margin-bottom:12px">📲</div>
+  <div style="font-size:15px;font-weight:700;margin-bottom:6px">Compartilhe com candidatos</div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:16px">Formulário público de cadastro:</div>
+  <div style="background:var(--green2);border-radius:var(--r2);padding:12px;font-family:var(--mono);font-size:12px;color:var(--green);margin-bottom:14px;word-break:break-all">https://vitagest.vercel.app/candidatos.html</div>
+  <button class="btn btn-g btn-sm" onclick="navigator.clipboard.writeText('https://vitagest.vercel.app/candidatos.html').then(()=>toast('Link copiado!','tok'))">📋 Copiar link</button></div>
+  <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:var(--r2);padding:14px;margin-top:8px">
+  <div style="font-size:11px;color:#92400e;margin-bottom:4px;font-family:var(--mono)">📋 GOOGLE FORMS</div>
+  <div style="font-size:12px;color:var(--t2)">Formulário Google: <a href="https://forms.gle/xKBZTzwxmRDM25hh7" target="_blank" style="color:var(--green)">forms.gle/xKBZTzwxmRDM25hh7</a></div></div>`;
+  document.getElementById('mCf').innerHTML='<button class="btn btn-g" onclick="closeM(\'mC\')">Fechar</button>';
+  openM('mC');
+}
+
+// ══════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════
+function salvarCfg(){
+localStorage.setItem(‘cfg_rs’,v(‘cfg-rs’));localStorage.setItem(‘cfg_cnpj’,v(‘cfg-cnpj’));
+localStorage.setItem(‘cfg_rh’,v(‘cfg-rh’));localStorage.setItem(‘cfg_wpp’,v(‘cfg-wpp’));
+toast(‘✅ Configurações salvas!’,‘tok’);
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+const v=id=>document.getElementById(id)?.value||’’;
+const ini=n=>n?n.split(’ ‘).slice(0,2).map(x=>x[0]).join(’’).toUpperCase():’?’;
+const today=()=>new Date().toISOString().split(‘T’)[0];
+const fmt=n=>{const x=Number(n);return isNaN(x)?n||‘0’:x.toLocaleString(‘pt-BR’);};
+const toArr=x=>Array.isArray(x)?x:(typeof x===‘string’&&x?x.replace(/[[]”]/g,’’).split(’,’).filter(Boolean):[]);
+const escL=e=>({medio_completo:‘Médio’,tecnico_completo:‘Técnico’,superior_completo:‘Superior’,superior_cursando:‘Sup. Curs.’,pos_graduacao:‘Pós-Grad.’}[e]||e||’—’);
+const dispL=d=>({imediata:‘Imediata’,‘7_dias’:‘7 dias’,‘15_dias’:‘15 dias’,‘30_dias’:‘30 dias’}[d]||d||’—’);
+const spL=s=>({novo:‘Novo’,analise:‘Em Análise’,aprovado:‘Aprovado’,recusado:‘Recusado’,contratado:‘Contratado’}[s]||s||’—’);
+const spC=s=>({novo:‘sp-n’,analise:‘sp-a’,aprovado:‘sp-ap’,recusado:‘sp-r’,contratado:‘sp-c’}[s]||‘sp-n’);
+
+function updateBadges(){
+const b1=document.getElementById(‘nb1’),b2=document.getElementById(‘nb2’),b3=document.getElementById(‘nb3’);
+if(b1)b1.textContent=cache.candidatos.filter(c=>c.status===‘novo’).length||‘0’;
+if(b2)b2.textContent=cache.admissoes.filter(a=>a.etapa!==‘ativo’).length||‘0’;
+if(b3)b3.textContent=cache.vagas.filter(v=>v.status===‘aberta’).length||‘0’;
+}
+
+function openM(id){document.getElementById(id).classList.add(‘open’);}
+function closeM(id){document.getElementById(id).classList.remove(‘open’);}
+function openSide(){document.getElementById(‘sidebar’).classList.add(‘open’);document.getElementById(‘sov’).classList.add(‘show’);}
+function closeSide(){document.getElementById(‘sidebar’).classList.remove(‘open’);document.getElementById(‘sov’).classList.remove(‘show’);}
+document.querySelectorAll(’.ov’).forEach(o=>o.addEventListener(‘click’,e=>{if(e.target===o)o.classList.remove(‘open’);}));
+
+function toast(msg,type=‘tinf’){
+const a=document.getElementById(‘toasts’),t=document.createElement(‘div’);
+t.className=`toast ${type}`;
+t.innerHTML=`<span style="font-size:16px">${type==='tok'?'✅':type==='twrn'?'⚠️':type==='terr'?'❌':'ℹ️'}</span><span>${msg}</span>`;
+a.appendChild(t);
+setTimeout(()=>{t.style.opacity=‘0’;t.style.transform=‘translateX(100%)’;t.style.transition=‘all .3s’;setTimeout(()=>t.remove(),300);},4000);
+}
+
+// INIT - carrega página primeiro, depois busca dados
+renderPage();
+setTimeout(syncAll, 100);
+</script>
+
+</body>
+</html>
