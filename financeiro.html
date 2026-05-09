@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitagest — Financeiro</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --verde: #1a7a4a; --verde-light: #22a85f; --verde-dark: #0f5233;
+  --verde-muted: #e8f5ee; --bg: #f5f7f5; --surface: #fff;
+  --border: #d4e6da; --text: #1a2e22; --text-muted: #5a7a65;
+  --danger: #c0392b; --shadow: 0 2px 12px rgba(26,122,74,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--verde-dark);display:flex;flex-direction:column;z-index:100;}
+.logo-area{padding:28px 24px 24px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:38px;height:38px;background:var(--verde-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;}
+.logo-text{color:#fff;font-size:1.2rem;font-weight:700;}
+.logo-sub{color:rgba(255,255,255,0.5);font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;}
+nav{flex:1;padding:16px 0;}
+.nav-section{padding:8px 16px 4px;color:rgba(255,255,255,0.35);font-size:0.62rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:rgba(255,255,255,0.75);font-size:0.87rem;cursor:pointer;border-left:3px solid transparent;transition:all 0.15s;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:var(--verde-light);font-weight:600;}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.1);}
+.status-dot{width:8px;height:8px;background:#2ecc71;border-radius:50%;display:inline-block;margin-right:6px;}
+.sidebar-footer span{color:rgba(255,255,255,0.45);font-size:0.72rem;}
+
+/* MAIN */
+.main{margin-left:230px;min-height:100vh;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.page-title{font-size:1rem;font-weight:600;}
+.topbar-right{display:flex;gap:12px;align-items:center;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:8px;font-size:0.84rem;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit;}
+.btn-primary{background:var(--verde);color:#fff;}
+.btn-primary:hover{background:var(--verde-light);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-muted);}
+.btn-outline:hover{border-color:var(--verde);color:var(--verde);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-sm{padding:5px 12px;font-size:0.78rem;}
+.content{padding:28px 32px;}
+.section{display:none;}.section.active{display:block;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;}
+.stat-card{background:var(--surface);border-radius:14px;padding:22px 24px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.stat-icon{font-size:1.4rem;margin-bottom:6px;}
+.stat-label{font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:4px;}
+.stat-value{font-size:1.6rem;font-weight:700;color:var(--verde-dark);}
+.stat-sub{font-size:0.72rem;color:var(--text-muted);margin-top:2px;}
+
+/* CARD */
+.card{background:var(--surface);border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px;}
+.card-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:0.92rem;font-weight:700;}
+.card-body{padding:0;}
+.card-pad{padding:24px;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+th{background:var(--verde-muted);color:var(--verde-dark);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.6px;padding:11px 16px;text-align:left;}
+td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--verde-muted);}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:600;}
+.badge-green{background:#d4edda;color:#155724;}
+.badge-red{background:#f8d7da;color:#721c24;}
+.badge-yellow{background:#fff3cd;color:#856404;}
+.badge-blue{background:#cce5ff;color:#004085;}
+.badge-gray{background:#e2e3e5;color:#383d41;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;}
+input,select,textarea{padding:9px 13px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.87rem;color:var(--text);background:var(--bg);transition:border 0.15s;outline:none;}
+input:focus,select:focus{border-color:var(--verde);background:#fff;}
+.form-actions{display:flex;gap:10px;margin-top:8px;justify-content:flex-end;}
+.form-section{font-size:0.72rem;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;grid-column:1/-1;border-bottom:1px solid var(--border);padding-bottom:6px;}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-backdrop.open{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:32px;min-width:620px;max-width:780px;width:95%;box-shadow:0 12px 48px rgba(0,0,0,0.18);max-height:92vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.modal-title{font-size:1.05rem;font-weight:700;}
+.modal-close{cursor:pointer;font-size:1.3rem;color:var(--text-muted);background:none;border:none;}
+
+/* CUSTO BREAKDOWN */
+.breakdown{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;}
+.breakdown-item{background:var(--bg);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}
+.breakdown-label{font-size:0.78rem;color:var(--text-muted);}
+.breakdown-value{font-size:0.88rem;font-weight:700;color:var(--verde-dark);}
+.breakdown-total{background:var(--verde-muted);border:1.5px solid var(--verde);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;grid-column:1/-1;}
+
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+.chart-card{background:var(--surface);border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);padding:20px;}
+.chart-title{font-size:0.85rem;font-weight:700;margin-bottom:16px;color:var(--text);}
+canvas{max-height:220px;}
+
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap;}
+.search-bar input{flex:1;min-width:200px;max-width:320px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;right:28px;background:var(--verde-dark);color:#fff;padding:14px 22px;border-radius:10px;font-size:0.88rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.18);z-index:9999;transform:translateY(80px);opacity:0;transition:all 0.3s;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.error{background:var(--danger);}
+
+.loading{text-align:center;padding:32px;color:var(--text-muted);}
+.spinner{display:inline-block;width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--verde);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text-muted);}
+.empty-state .icon{font-size:2.5rem;margin-bottom:12px;}
+
+.custo-tag{font-size:0.75rem;font-weight:600;color:var(--verde-dark);background:var(--verde-muted);padding:2px 8px;border-radius:12px;}
+
+@media(max-width:900px){
+  .sidebar{width:56px;}
+  .logo-text,.logo-sub,.nav-section,.nav-item span,.sidebar-footer span{display:none;}
+  .main{margin-left:56px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .charts-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo-area">
+    <div class="logo">
+      <div class="logo-icon">V</div>
+      <div><div class="logo-text">Vitagest</div><div class="logo-sub">Financeiro</div></div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">Módulos</div>
+    <div class="nav-item active" onclick="navigate('dashboard')"><span>📊</span><span>Dashboard</span></div>
+    <div class="nav-item" onclick="navigate('funcionarios')"><span>👥</span><span>Funcionários</span></div>
+    <div class="nav-item" onclick="navigate('folha')"><span>💰</span><span>Folha de Pagamento</span></div>
+    <div class="nav-item" onclick="navigate('provisoes')"><span>📅</span><span>Provisões</span></div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" onclick="window.open('https://vitagest.vercel.app','_blank')"><span>🏥</span><span>Módulo RH</span></div>
+  </nav>
+  <div class="sidebar-footer"><span class="status-dot"></span><span>Supabase conectado</span></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">Dashboard Financeiro</div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="refreshAll()">🔄 Atualizar</button>
+      <button class="btn btn-primary btn-sm" id="btnNew" onclick="abrirNovoFuncionario()" style="display:none">+ Novo Funcionário</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="sec-dashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">Funcionários Ativos</div><div class="stat-value" id="st-func">–</div></div>
+        <div class="stat-card"><div class="stat-icon">💵</div><div class="stat-label">Folha Bruta</div><div class="stat-value" id="st-folha">–</div></div>
+        <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-label">Encargos Est.</div><div class="stat-value" id="st-encargos">–</div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Custo Total Real</div><div class="stat-value" id="st-total">–</div><div class="stat-sub">com provisões</div></div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card"><div class="chart-title">📊 Custo por Setor</div><canvas id="chartSetor"></canvas></div>
+        <div class="chart-card"><div class="chart-title">🥧 Composição da Folha</div><canvas id="chartComposicao"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Resumo por Setor</span></div>
+        <div class="card-body" id="dash-setores"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- FUNCIONÁRIOS -->
+    <div class="section" id="sec-funcionarios">
+      <div class="search-bar">
+        <input type="text" id="searchFunc" placeholder="Buscar funcionário..." oninput="filtrarFuncionarios()">
+        <select id="filterSetor" onchange="filtrarFuncionarios()">
+          <option value="">Todos os setores</option>
+        </select>
+        <select id="filterStatus" onchange="filtrarFuncionarios()">
+          <option value="">Todos</option>
+          <option value="Ativo">Ativo</option>
+          <option value="Inativo">Inativo</option>
+          <option value="Experiência">Experiência</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Funcionários Cadastrados</span></div>
+        <div class="card-body" id="table-funcionarios"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- FOLHA -->
+    <div class="section" id="sec-folha">
+      <div class="card">
+        <div class="card-header"><span class="card-title">💰 Folha de Pagamento Detalhada</span></div>
+        <div class="card-body" id="table-folha"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- PROVISÕES -->
+    <div class="section" id="sec-provisoes">
+      <div class="card">
+        <div class="card-header"><span class="card-title">📅 Provisões Mensais</span></div>
+        <div class="card-body" id="table-provisoes"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+      <div class="card" style="margin-top:22px">
+        <div class="card-header"><span class="card-title">📋 Contratos em Experiência / Próximos de Rescisão</span></div>
+        <div class="card-body" id="table-alertas"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL FUNCIONÁRIO -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Novo Funcionário</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- MODAL VER FUNCIONÁRIO -->
+<div class="modal-backdrop" id="modalVer">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalVerTitle">Ficha do Funcionário</span>
+      <button class="modal-close" onclick="document.getElementById('modalVer').classList.remove('open')">✕</button>
+    </div>
+    <div id="modalVerBody"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://nanynbwmivtyopinptfr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbnluYndtaXZ0eW9waW5wdGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NjU3ODYsImV4cCI6MjA5MzM0MTc4Nn0.T9hLvQcRJ8Gsa9uUVeMrQ4K7qkL1Ib3ZDoY0eRYoD2Q';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Encargos CLT estimados
+const ENCARGO_PERC = 0.3136; // INSS patronal 20% + FGTS 8% + RAT~3% + terceiros ~5.8%
+const DECIMO_PERC = 1/12;
+const FERIAS_PERC = 1/12;
+const TERCO_PERC = (1/12) * (1/3);
+
+let todosFunc = [];
+let chartSetor, chartComp;
+
+// ─── NAV ───
+function navigate(s) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.nav-item[onclick="navigate('${s}')"]`).classList.add('active');
+  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+  document.getElementById('sec-' + s).classList.add('active');
+  const titles = {dashboard:'Dashboard Financeiro', funcionarios:'Funcionários', folha:'Folha de Pagamento', provisoes:'Provisões'};
+  document.getElementById('pageTitle').textContent = titles[s];
+  document.getElementById('btnNew').style.display = s === 'funcionarios' ? '' : 'none';
+  if (s !== 'dashboard') loadSection(s);
+}
+
+function refreshAll() { loadDashboard(); loadSection(currentSection()); }
+function currentSection() {
+  const active = document.querySelector('.section.active');
+  return active ? active.id.replace('sec-','') : 'dashboard';
+}
+
+// ─── FETCH ───
+async function fetchFinanceiro() {
+  const { data, error } = await sb.from('financeiro').select('*').order('id', {ascending:false});
+  if (error) { showToast('Erro: ' + error.message, true); return []; }
+  return data || [];
+}
+
+// ─── CÁLCULOS ───
+function calcCusto(r) {
+  const sal = parseFloat(r.salario_base) || 0;
+  const insalub = parseFloat(r.insalubridade) || 0;
+  const vt = parseFloat(r.vale_transporte) || 0;
+  const va = parseFloat(r.vale_alimentacao) || 0;
+  const bruto = sal + insalub;
+  const encargos = bruto * ENCARGO_PERC;
+  const decimo = bruto * DECIMO_PERC;
+  const ferias = bruto * FERIAS_PERC;
+  const terco = bruto * TERCO_PERC;
+  const totalMensal = bruto + encargos + vt + va + decimo + ferias + terco;
+  return { sal, insalub, vt, va, bruto, encargos, decimo, ferias, terco, totalMensal };
+}
+
+// ─── DASHBOARD ───
+async function loadDashboard() {
+  todosFunc = await fetchFinanceiro();
+  const ativos = todosFunc.filter(r => r.status !== 'Inativo');
+
+  let folhaBruta = 0, totalEncargos = 0, totalReal = 0;
+  ativos.forEach(r => {
+    const c = calcCusto(r);
+    folhaBruta += c.bruto;
+    totalEncargos += c.encargos;
+    totalReal += c.totalMensal;
+  });
+
+  document.getElementById('st-func').textContent = ativos.length;
+  document.getElementById('st-folha').textContent = fmtBRL(folhaBruta);
+  document.getElementById('st-encargos').textContent = fmtBRL(totalEncargos);
+  document.getElementById('st-total').textContent = fmtBRL(totalReal);
+
+  renderSetores(ativos);
+  renderCharts(ativos);
+  preencherFiltroSetor();
+}
+
+function renderSetores(data) {
+  const el = document.getElementById('dash-setores');
+  if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📂</div><p>Nenhum funcionário cadastrado</p></div>'; return; }
+  const setores = {};
+  data.forEach(r => {
+    const s = r.setor || 'Sem setor';
+    if (!setores[s]) setores[s] = { count: 0, folha: 0, total: 0 };
+    const c = calcCusto(r);
+    setores[s].count++;
+    setores[s].folha += c.bruto;
+    setores[s].total += c.totalMensal;
+  });
+  el.innerHTML = `<table><thead><tr><th>Setor</th><th>Funcionários</th><th>Folha Bruta</th><th>Custo Total</th></tr></thead><tbody>
+    ${Object.entries(setores).map(([s,v]) => `<tr>
+      <td><strong>${s}</strong></td>
+      <td>${v.count}</td>
+      <td>${fmtBRL(v.folha)}</td>
+      <td><span class="custo-tag">${fmtBRL(v.total)}</span></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function renderCharts(data) {
+  const setores = {};
+  let sal=0, insalub=0, encargos=0, beneficios=0, provisoes=0;
+  data.forEach(r => {
+    const s = r.setor || 'Sem setor';
+    const c = calcCusto(r);
+    if (!setores[s]) setores[s] = 0;
+    setores[s] += c.totalMensal;
+    sal += c.sal;
+    insalub += c.insalub;
+    encargos += c.encargos;
+    beneficios += c.vt + c.va;
+    provisoes += c.decimo + c.ferias + c.terco;
+  });
+
+  const cores = ['#1a7a4a','#22a85f','#2ecc71','#0f5233','#4caf50','#81c784'];
+
+  if (chartSetor) chartSetor.destroy();
+  chartSetor = new Chart(document.getElementById('chartSetor'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(setores),
+      datasets: [{ label: 'Custo Total', data: Object.values(setores), backgroundColor: cores, borderRadius: 6 }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => 'R$' + (v/1000).toFixed(1)+'k' } } } }
+  });
+
+  if (chartComp) chartComp.destroy();
+  chartComp = new Chart(document.getElementById('chartComposicao'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Salários', 'Insalubridade', 'Encargos', 'Benefícios', 'Provisões'],
+      datasets: [{ data: [sal, insalub, encargos, beneficios, provisoes], backgroundColor: ['#1a7a4a','#22a85f','#e67e22','#3498db','#9b59b6'], borderWidth: 2 }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+  });
+}
+
+// ─── FUNCIONÁRIOS ───
+async function loadSection(s) {
+  if (s === 'dashboard') { loadDashboard(); return; }
+  if (s === 'funcionarios') { await loadFuncionarios(); return; }
+  if (s === 'folha') { await loadFolha(); return; }
+  if (s === 'provisoes') { await loadProvisoes(); return; }
+}
+
+async function loadFuncionarios() {
+  const el = document.getElementById('table-funcionarios');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  todosFunc = await fetchFinanceiro();
+  preencherFiltroSetor();
+  renderFuncionarios(todosFunc);
+}
+
+function renderFuncionarios(data) {
+  const el = document.getElementById('table-funcionarios');
+  if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="icon">👥</div><p>Nenhum funcionário cadastrado</p></div>'; return; }
+  el.innerHTML = `<table><thead><tr><th>Nome</th><th>Cargo</th><th>Setor</th><th>Admissão</th><th>Salário Base</th><th>Custo Total</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(r => {
+      const c = calcCusto(r);
+      return `<tr>
+        <td><strong>${r.nome||'–'}</strong></td>
+        <td>${r.cargo||'–'}</td>
+        <td>${r.setor||'–'}</td>
+        <td>${fmtDate(r.data_admissao)}</td>
+        <td>${fmtBRL(c.sal)}</td>
+        <td><span class="custo-tag">${fmtBRL(c.totalMensal)}</span></td>
+        <td>${badgeStatus(r.status||'Ativo')}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="verFuncionario(${r.id})">👁 Ver</button>
+          <button class="btn btn-outline btn-sm" onclick="editarFuncionario(${r.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deletarFuncionario(${r.id})">🗑</button>
+        </td>
+      </tr>`;
+    }).join('')}
+  </tbody></table>`;
+}
+
+function filtrarFuncionarios() {
+  const q = (document.getElementById('searchFunc')?.value||'').toLowerCase();
+  const setor = document.getElementById('filterSetor')?.value||'';
+  const status = document.getElementById('filterStatus')?.value||'';
+  let data = todosFunc;
+  if (q) data = data.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+  if (setor) data = data.filter(r => r.setor === setor);
+  if (status) data = data.filter(r => r.status === status);
+  renderFuncionarios(data);
+}
+
+function preencherFiltroSetor() {
+  const sel = document.getElementById('filterSetor');
+  if (!sel) return;
+  const setores = [...new Set(todosFunc.map(r => r.setor).filter(Boolean))];
+  const val = sel.value;
+  sel.innerHTML = '<option value="">Todos os setores</option>' + setores.map(s => `<option value="${s}">${s}</option>`).join('');
+  sel.value = val;
+}
+
+// ─── FOLHA ───
+async function loadFolha() {
+  const el = document.getElementById('table-folha');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const data = (await fetchFinanceiro()).filter(r => r.status !== 'Inativo');
+  if (!data.length) { el.innerHTML = '<div class="empty-state"><div class="icon">💰</div><p>Nenhum funcionário ativo</p></div>'; return; }
+
+  let totSal=0, totInsalub=0, totVt=0, totVa=0, totEncargos=0, totTotal=0;
+  const rows = data.map(r => {
+    const c = calcCusto(r);
+    totSal+=c.sal; totInsalub+=c.insalub; totVt+=c.vt; totVa+=c.va; totEncargos+=c.encargos; totTotal+=c.totalMensal;
+    return `<tr>
+      <td><strong>${r.nome||'–'}</strong></td>
+      <td>${r.cargo||'–'}</td>
+      <td>${fmtBRL(c.sal)}</td>
+      <td>${fmtBRL(c.insalub)}</td>
+      <td>${fmtBRL(c.vt)}</td>
+      <td>${fmtBRL(c.va)}</td>
+      <td>${fmtBRL(c.encargos)}</td>
+      <td><strong>${fmtBRL(c.bruto + c.encargos + c.vt + c.va)}</strong></td>
+    </tr>`;
+  });
+
+  el.innerHTML = `<table><thead><tr>
+    <th>Nome</th><th>Cargo</th><th>Salário</th><th>Insalub.</th><th>Vale Transp.</th><th>Vale Alim.</th><th>Encargos</th><th>Custo Mensal</th>
+  </tr></thead><tbody>
+    ${rows.join('')}
+    <tr style="background:var(--verde-muted);font-weight:700">
+      <td colspan="2">TOTAL</td>
+      <td>${fmtBRL(totSal)}</td>
+      <td>${fmtBRL(totInsalub)}</td>
+      <td>${fmtBRL(totVt)}</td>
+      <td>${fmtBRL(totVa)}</td>
+      <td>${fmtBRL(totEncargos)}</td>
+      <td>${fmtBRL(totTotal - (data.reduce((a,r)=>{const c=calcCusto(r);return a+c.decimo+c.ferias+c.terco;},0)))}</td>
+    </tr>
+  </tbody></table>`;
+}
+
+// ─── PROVISÕES ───
+async function loadProvisoes() {
+  const elP = document.getElementById('table-provisoes');
+  const elA = document.getElementById('table-alertas');
+  elP.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  elA.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  const data = await fetchFinanceiro();
+  const ativos = data.filter(r => r.status !== 'Inativo');
+
+  // Provisões
+  let tot13=0, totFer=0, totTerco=0, totGeral=0;
+  const rowsProv = ativos.map(r => {
+    const c = calcCusto(r);
+    tot13+=c.decimo; totFer+=c.ferias; totTerco+=c.terco; totGeral+=c.decimo+c.ferias+c.terco;
+    return `<tr>
+      <td><strong>${r.nome||'–'}</strong></td>
+      <td>${r.cargo||'–'}</td>
+      <td>${fmtBRL(c.bruto)}</td>
+      <td>${fmtBRL(c.decimo)}</td>
+      <td>${fmtBRL(c.ferias)}</td>
+      <td>${fmtBRL(c.terco)}</td>
+      <td><strong>${fmtBRL(c.decimo+c.ferias+c.terco)}</strong></td>
+    </tr>`;
+  });
+
+  elP.innerHTML = `<table><thead><tr>
+    <th>Nome</th><th>Cargo</th><th>Salário Bruto</th><th>Prov. 13º</th><th>Prov. Férias</th><th>Prov. 1/3 Férias</th><th>Total Mensal</th>
+  </tr></thead><tbody>
+    ${rowsProv.join('')}
+    <tr style="background:var(--verde-muted);font-weight:700">
+      <td colspan="3">TOTAL PROVISÕES/MÊS</td>
+      <td>${fmtBRL(tot13)}</td>
+      <td>${fmtBRL(totFer)}</td>
+      <td>${fmtBRL(totTerco)}</td>
+      <td>${fmtBRL(totGeral)}</td>
+    </tr>
+  </tbody></table>`;
+
+  // Alertas
+  const hoje = new Date();
+  const alertas = data.filter(r => {
+    if (r.contrato_experiencia) return true;
+    if (r.previsao_rescisao) {
+      const diff = (new Date(r.previsao_rescisao) - hoje) / (1000*60*60*24);
+      return diff <= 60;
+    }
+    return false;
+  });
+
+  if (!alertas.length) {
+    elA.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>Nenhum alerta no momento</p></div>';
+    return;
+  }
+
+  elA.innerHTML = `<table><thead><tr><th>Nome</th><th>Cargo</th><th>Situação</th><th>Data</th><th>Dias Restantes</th></tr></thead><tbody>
+    ${alertas.map(r => {
+      const dias = r.previsao_rescisao ? Math.ceil((new Date(r.previsao_rescisao) - hoje)/(1000*60*60*24)) : '–';
+      const badge = r.contrato_experiencia ? '<span class="badge badge-yellow">Experiência</span>' : '<span class="badge badge-red">Rescisão</span>';
+      return `<tr>
+        <td><strong>${r.nome||'–'}</strong></td>
+        <td>${r.cargo||'–'}</td>
+        <td>${badge}</td>
+        <td>${fmtDate(r.previsao_rescisao)}</td>
+        <td>${typeof dias === 'number' ? (dias <= 30 ? `<strong style="color:var(--danger)">${dias} dias</strong>` : dias + ' dias') : '–'}</td>
+      </tr>`;
+    }).join('')}
+  </tbody></table>`;
+}
+
+// ─── FORM FUNCIONÁRIO ───
+function abrirNovoFuncionario() {
+  document.getElementById('modalTitle').textContent = '+ Novo Funcionário';
+  document.getElementById('modalBody').innerHTML = formFuncionario();
+  document.getElementById('modal').classList.add('open');
+}
+
+function formFuncionario(r) {
+  return `
+  <div class="form-grid">
+    <div class="form-section">Dados Pessoais</div>
+    <div class="form-group full"><label>Nome Completo</label><input id="f-nome" value="${r?.nome||''}" placeholder="Nome completo"></div>
+    <div class="form-group"><label>Cargo</label><input id="f-cargo" value="${r?.cargo||''}" placeholder="Ex: Técnico de Enfermagem"></div>
+    <div class="form-group"><label>Setor</label><input id="f-setor" value="${r?.setor||''}" placeholder="Ex: Saúde, Administração"></div>
+    <div class="form-group"><label>Data de Admissão</label><input id="f-data_admissao" type="date" value="${r?.data_admissao||''}"></div>
+    <div class="form-group"><label>Carga Horária</label><input id="f-carga_horaria" value="${r?.carga_horaria||''}" placeholder="Ex: 40h/semana"></div>
+
+    <div class="form-section">Remuneração</div>
+    <div class="form-group"><label>Salário Base (R$)</label><input id="f-salario_base" type="number" value="${r?.salario_base||''}" placeholder="0,00"></div>
+    <div class="form-group"><label>Insalubridade (R$)</label><input id="f-insalubridade" type="number" value="${r?.insalubridade||0}" placeholder="0,00"></div>
+    <div class="form-group"><label>Vale Alimentação (R$)</label><input id="f-vale_alimentacao" type="number" value="${r?.vale_alimentacao||0}" placeholder="0,00"></div>
+    <div class="form-group"><label>Vale Transporte (R$)</label><input id="f-vale_transporte" type="number" value="${r?.vale_transporte||0}" placeholder="0,00"></div>
+
+    <div class="form-section">Contrato</div>
+    <div class="form-group"><label>Custo por Contrato/Prefeitura</label><input id="f-custo_contrato" value="${r?.custo_contrato||''}" placeholder="Ex: Contrato 001/2025"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="f-status">
+        <option ${r?.status==='Ativo'?'selected':''}>Ativo</option>
+        <option ${r?.status==='Experiência'?'selected':''}>Experiência</option>
+        <option ${r?.status==='Inativo'?'selected':''}>Inativo</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Contrato de Experiência?</label>
+      <select id="f-contrato_experiencia">
+        <option value="false" ${!r?.contrato_experiencia?'selected':''}>Não</option>
+        <option value="true" ${r?.contrato_experiencia?'selected':''}>Sim</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Previsão de Rescisão</label><input id="f-previsao_rescisao" type="date" value="${r?.previsao_rescisao||''}"></div>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+    <button class="btn btn-primary" onclick="salvarFuncionario(${r?.id||'null'})">💾 Salvar</button>
+  </div>`;
+}
+
+async function salvarFuncionario(id) {
+  const campos = ['nome','cargo','setor','data_admissao','carga_horaria','salario_base','insalubridade','vale_alimentacao','vale_transporte','custo_contrato','status','contrato_experiencia','previsao_rescisao'];
+  const obj = {};
+  campos.forEach(f => {
+    const el = document.getElementById('f-'+f);
+    if (!el) return;
+    if (f === 'contrato_experiencia') obj[f] = el.value === 'true';
+    else if (['salario_base','insalubridade','vale_alimentacao','vale_transporte'].includes(f)) obj[f] = parseFloat(el.value)||0;
+    else if (el.value) obj[f] = el.value;
+  });
+
+  let res;
+  if (id && id !== 'null') res = await sb.from('financeiro').update(obj).eq('id', id);
+  else res = await sb.from('financeiro').insert([obj]);
+
+  if (res.error) { showToast('Erro: ' + res.error.message, true); return; }
+  showToast('Funcionário salvo!');
+  closeModal();
+  loadFuncionarios();
+  loadDashboard();
+}
+
+async function editarFuncionario(id) {
+  const { data: r, error } = await sb.from('financeiro').select('*').eq('id', id).single();
+  if (error||!r) { showToast('Erro', true); return; }
+  document.getElementById('modalTitle').textContent = 'Editar: ' + r.nome;
+  document.getElementById('modalBody').innerHTML = formFuncionario(r);
+  document.getElementById('modal').classList.add('open');
+}
+
+async function deletarFuncionario(id) {
+  if (!confirm('Confirma exclusão?')) return;
+  const { error } = await sb.from('financeiro').delete().eq('id', id);
+  if (error) { showToast('Erro: ' + error.message, true); return; }
+  showToast('Excluído!');
+  loadFuncionarios();
+  loadDashboard();
+}
+
+async function verFuncionario(id) {
+  const { data: r, error } = await sb.from('financeiro').select('*').eq('id', id).single();
+  if (error||!r) { showToast('Erro', true); return; }
+  const c = calcCusto(r);
+  document.getElementById('modalVerTitle').textContent = '👤 ' + r.nome;
+  document.getElementById('modalVerBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+      ${fi('Cargo', r.cargo)} ${fi('Setor', r.setor)}
+      ${fi('Admissão', fmtDate(r.data_admissao))} ${fi('Carga Horária', r.carga_horaria)}
+      ${fi('Status', badgeStatus(r.status||'Ativo'))} ${fi('Contrato Exp.', r.contrato_experiencia ? 'Sim' : 'Não')}
+      ${fi('Previsão Rescisão', fmtDate(r.previsao_rescisao))} ${fi('Ref. Contrato', r.custo_contrato)}
+    </div>
+    <div class="breakdown">
+      ${bi('Salário Base', fmtBRL(c.sal))}
+      ${bi('Insalubridade', fmtBRL(c.insalub))}
+      ${bi('Vale Transporte', fmtBRL(c.vt))}
+      ${bi('Vale Alimentação', fmtBRL(c.va))}
+      ${bi('Encargos (~31,36%)', fmtBRL(c.encargos))}
+      ${bi('Provisão 13º', fmtBRL(c.decimo))}
+      ${bi('Provisão Férias', fmtBRL(c.ferias))}
+      ${bi('Provisão 1/3 Férias', fmtBRL(c.terco))}
+      <div class="breakdown-total" style="grid-column:1/-1">
+        <span style="font-weight:700;font-size:0.9rem">💰 Custo Mensal Real</span>
+        <span style="font-size:1.2rem;font-weight:700;color:var(--verde-dark)">${fmtBRL(c.totalMensal)}</span>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:16px">
+      <button class="btn btn-outline" onclick="document.getElementById('modalVer').classList.remove('open')">Fechar</button>
+    </div>`;
+  document.getElementById('modalVer').classList.add('open');
+}
+
+function fi(label, valor) {
+  return `<div><div style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-bottom:2px">${label}</div>
+  <div style="font-size:0.87rem">${valor||'–'}</div></div>`;
+}
+function bi(label, valor) {
+  return `<div class="breakdown-item"><span class="breakdown-label">${label}</span><span class="breakdown-value">${valor}</span></div>`;
+}
+
+// ─── UTILS ───
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function fmtBRL(v) { return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function fmtDate(d) { if(!d) return '–'; try { return new Date(d+'T12:00:00').toLocaleDateString('pt-BR'); } catch { return d; } }
+function badgeStatus(s) {
+  const m = {'Ativo':'badge-green','Inativo':'badge-red','Experiência':'badge-yellow'};
+  return `<span class="badge ${m[s]||'badge-gray'}">${s}</span>`;
+}
+let toastTimer;
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show'+(isError?' error':'');
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{t.className='';}, 3000);
+}
+
+// ─── INIT ───
+loadDashboard();
+</script>
+</body>
+</html>
