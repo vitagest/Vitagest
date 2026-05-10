@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitagest — Gestão Financeira</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--v:#1a7a4a;--vl:#22a85f;--vd:#0f5233;--vm:#e8f5ee;--bg:#f4f6f4;--sf:#fff;--bd:#d0e8d8;--tx:#162318;--mu:#5a7a65;--dg:#c0392b;--wn:#e67e22;--sh:0 2px 16px rgba(26,122,74,0.09);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:236px;background:var(--vd);display:flex;flex-direction:column;z-index:100;}
+.logo-area{padding:22px 18px;border-bottom:1px solid rgba(255,255,255,.1);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:34px;height:34px;background:var(--vl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+.logo-text{color:#fff;font-size:1rem;font-weight:700;}.logo-sub{color:rgba(255,255,255,.4);font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;}
+nav{flex:1;padding:10px 0;overflow-y:auto;}
+.ng{padding:6px 14px 2px;color:rgba(255,255,255,.3);font-size:.56rem;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-top:6px;}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 16px;color:rgba(255,255,255,.7);font-size:.8rem;cursor:pointer;border-left:3px solid transparent;transition:all .15s;}
+.ni:hover{background:rgba(255,255,255,.07);color:#fff;}
+.ni.active{background:rgba(255,255,255,.11);color:#fff;border-left-color:var(--vl);font-weight:600;}
+.ni .ic{font-size:.9rem;width:18px;text-align:center;flex-shrink:0;}
+.sf-bar{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);}
+.dot{width:7px;height:7px;background:#2ecc71;border-radius:50%;display:inline-block;margin-right:6px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sf-bar span{color:rgba(255,255,255,.4);font-size:.65rem;}
+.main{margin-left:236px;min-height:100vh;}
+.topbar{background:var(--sf);border-bottom:1px solid var(--bd);padding:0 26px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(0,0,0,.06);}
+.pt{font-size:.92rem;font-weight:700;}.tr{display:flex;gap:8px;align-items:center;}
+.content{padding:22px 26px;}
+.sec{display:none;}.sec.active{display:block;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:inherit;white-space:nowrap;}
+.bp{background:var(--v);color:#fff;}.bp:hover{background:var(--vl);}
+.bo{background:transparent;border:1.5px solid var(--bd);color:var(--mu);}.bo:hover{border-color:var(--v);color:var(--v);}
+.bd2{background:var(--dg);color:#fff;}
+.bw{background:var(--wn);color:#fff;}
+.bsm{padding:4px 10px;font-size:.72rem;}.bxs{padding:3px 8px;font-size:.67rem;}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.sc{background:var(--sf);border-radius:12px;padding:18px 20px;border:1px solid var(--bd);box-shadow:var(--sh);position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--vl);}
+.sc.red::before{background:var(--dg);}.sc.orange::before{background:var(--wn);}.sc.blue::before{background:#2980b9;}
+.si{font-size:1.2rem;margin-bottom:5px;}.sl{font-size:.65rem;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:2px;}
+.sv{font-size:1.3rem;font-weight:700;color:var(--vd);font-family:'DM Mono',monospace;}.ss{font-size:.65rem;color:var(--mu);margin-top:2px;}
+.tu{color:#27ae60;font-size:.68rem;font-weight:700;}.td{color:var(--dg);font-size:.68rem;font-weight:700;}
+.card{background:var(--sf);border-radius:12px;border:1px solid var(--bd);box-shadow:var(--sh);overflow:hidden;margin-bottom:18px;}
+.ch{padding:14px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.ct{font-size:.86rem;font-weight:700;}.cb{padding:0;}.cp{padding:20px;}
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.76rem;}
+th{background:var(--vm);color:var(--vd);font-weight:700;font-size:.64rem;text-transform:uppercase;letter-spacing:.7px;padding:9px 13px;text-align:left;white-space:nowrap;}
+td{padding:9px 13px;border-bottom:1px solid var(--bd);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:#f0f9f4;}
+.mono{font-family:'DM Mono',monospace;font-size:.74rem;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.64rem;font-weight:700;}
+.bg{background:#d4edda;color:#155724;}.br{background:#f8d7da;color:#721c24;}.by{background:#fff3cd;color:#856404;}.bb{background:#cce5ff;color:#004085;}.bgr{background:#e2e3e5;color:#383d41;}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.64rem;font-weight:700;background:var(--vm);color:var(--vd);}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg3{grid-template-columns:1fr 1fr 1fr;}
+.fgrp{display:flex;flex-direction:column;gap:3px;}.fgrp.full{grid-column:1/-1;}
+label{font-size:.66rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;}
+input,select,textarea{padding:7px 11px;border-radius:6px;border:1.5px solid var(--bd);font-family:inherit;font-size:.81rem;color:var(--tx);background:var(--bg);transition:border .15s;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--v);background:#fff;}
+.fsec{font-size:.62rem;font-weight:800;color:var(--v);text-transform:uppercase;letter-spacing:1.5px;grid-column:1/-1;border-bottom:1px solid var(--bd);padding-bottom:4px;margin-top:6px;}
+.fa{display:flex;gap:8px;margin-top:10px;justify-content:flex-end;}
+.mb{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:200;display:none;align-items:center;justify-content:center;padding:14px;}
+.mb.open{display:flex;}
+.modal{background:#fff;border-radius:14px;padding:26px;width:100%;max-width:720px;box-shadow:0 16px 56px rgba(0,0,0,.2);max-height:92vh;overflow-y:auto;}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.mt{font-size:.98rem;font-weight:700;}.mc{cursor:pointer;font-size:1.1rem;color:var(--mu);background:none;border:none;}
+.cr{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.cc{background:var(--sf);border-radius:11px;border:1px solid var(--bd);box-shadow:var(--sh);padding:16px;}
+.cc-t{font-size:.78rem;font-weight:700;margin-bottom:12px;}
+canvas{max-height:190px;}
+.bk{background:var(--bg);border-radius:7px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.bk-l{font-size:.7rem;color:var(--mu);}.bk-v{font-size:.78rem;font-weight:700;color:var(--vd);font-family:'DM Mono',monospace;}
+.bk-total{background:var(--vm);border:1.5px solid var(--v);border-radius:9px;padding:11px 15px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.sb{display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
+.sb input{flex:1;min-width:160px;max-width:260px;}.sb select{min-width:130px;}
+.ht{position:relative;padding-left:22px;}
+.ht::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--bd);}
+.hi{position:relative;margin-bottom:14px;}
+.hi::before{content:'';position:absolute;left:-18px;top:5px;width:9px;height:9px;background:var(--v);border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px var(--v);}
+.hm{font-size:.68rem;font-weight:700;color:var(--mu);text-transform:uppercase;margin-bottom:3px;}
+.hc{background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;display:grid;grid-template-columns:repeat(5,1fr) auto;gap:10px;align-items:center;}
+.hvl{font-size:.61rem;color:var(--mu);margin-bottom:1px;}.hv{font-size:.78rem;font-weight:700;font-family:'DM Mono',monospace;color:var(--vd);}
+/* AI CHAT */
+.ai-wrap{display:flex;flex-direction:column;height:520px;}
+.ai-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.ai-msg{max-width:85%;padding:10px 14px;border-radius:10px;font-size:.82rem;line-height:1.5;}
+.ai-msg.user{background:var(--v);color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
+.ai-msg.bot{background:var(--vm);color:var(--tx);align-self:flex-start;border-bottom-left-radius:3px;}
+.ai-msg.bot.loading{color:var(--mu);font-style:italic;}
+.ai-input{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--bd);}
+.ai-input input{flex:1;border-radius:20px;padding:9px 16px;}
+.ai-input button{border-radius:20px;padding:9px 20px;}
+.ai-quick{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px 0;border-top:1px solid var(--bd);}
+.aq{padding:4px 10px;border-radius:14px;font-size:.7rem;cursor:pointer;border:1px solid var(--bd);background:#fff;color:var(--mu);transition:all .15s;}
+.aq:hover{border-color:var(--v);color:var(--v);}
+/* RESCISÃO */
+.resc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.resc-card{background:var(--vm);border:1px solid var(--v);border-radius:10px;padding:14px;}
+.resc-title{font-size:.72rem;font-weight:700;color:var(--vd);text-transform:uppercase;margin-bottom:10px;}
+.resc-item{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.78rem;}
+.resc-label{color:var(--mu);}.resc-value{font-weight:700;font-family:'DM Mono',monospace;}
+.resc-total{background:var(--vd);color:#fff;border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+/* PROVISÕES ACUMULADAS */
+.prov-timeline{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;}
+.pt-item{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center;}
+.pt-mes{font-size:.62rem;color:var(--mu);margin-bottom:4px;}
+.pt-val{font-size:.8rem;font-weight:700;color:var(--vd);font-family:'DM Mono',monospace;}
+.pt-cum{font-size:.65rem;color:var(--v);font-weight:600;}
+/* SALDO RESERVA */
+.reserva-card{background:linear-gradient(135deg,var(--vd),var(--v));border-radius:12px;padding:22px;color:#fff;margin-bottom:18px;}
+.reserva-title{font-size:.8rem;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.reserva-val{font-size:2rem;font-weight:700;font-family:'DM Mono',monospace;margin-bottom:4px;}
+.reserva-sub{font-size:.72rem;opacity:.7;}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--vd);color:#fff;padding:11px 18px;border-radius:9px;font-size:.81rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:300px;}
+#toast.show{transform:translateY(0);opacity:1;}#toast.err{background:var(--dg);}
+.loading{text-align:center;padding:26px;color:var(--mu);}
+.sp{display:inline-block;width:18px;height:18px;border:3px solid var(--bd);border-top-color:var(--v);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.es{text-align:center;padding:36px 18px;color:var(--mu);}
+.es .ei{font-size:2rem;margin-bottom:8px;}.es p{font-size:.8rem;}
+.dv{height:1px;background:var(--bd);margin:14px 0;}
+@media(max-width:900px){.sidebar{width:50px;}.logo-text,.logo-sub,.ng,.ni span:not(.ic),.sf-bar span{display:none;}.main{margin-left:50px;}.sg{grid-template-columns:1fr 1fr;}.fg{grid-template-columns:1fr;}.cr{grid-template-columns:1fr;}.hc{grid-template-columns:1fr 1fr;}.prov-timeline{grid-template-columns:repeat(3,1fr);}.resc-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo-area"><div class="logo"><div class="logo-icon">V</div><div><div class="logo-text">Vitagest</div><div class="logo-sub">Financeiro</div></div></div></div>
+  <nav>
+    <div class="ng">Visão Geral</div>
+    <div class="ni active" onclick="nav('dash')"><span class="ic">📊</span><span>Dashboard</span></div>
+    <div class="ng">Pessoas</div>
+    <div class="ni" onclick="nav('func')"><span class="ic">👥</span><span>Funcionários</span></div>
+    <div class="ni" onclick="nav('cargos')"><span class="ic">🏷️</span><span>Cargos Padrão</span></div>
+    <div class="ng">Financeiro</div>
+    <div class="ni" onclick="nav('fundo')"><span class="ic">🏦</span><span>Fundo de Reserva</span></div>
+    <div class="ni" onclick="nav('folha')"><span class="ic">💰</span><span>Folha Detalhada</span></div>
+    <div class="ni" onclick="nav('encargos')"><span class="ic">🏛️</span><span>Encargos & Impostos</span></div>
+    <div class="ni" onclick="nav('provisoes')"><span class="ic">📅</span><span>Provisões</span></div>
+    <div class="ni" onclick="nav('reserva')"><span class="ic">🏦</span><span>Saldo de Reserva</span></div>
+    <div class="ni" onclick="nav('rescisao')"><span class="ic">⚖️</span><span>Simulador Rescisão</span></div>
+    <div class="ni" onclick="nav('historico')"><span class="ic">📋</span><span>Histórico Mensal</span></div>
+    <div class="ni" onclick="nav('projecao')"><span class="ic">📈</span><span>Projeção 5 Anos</span></div>
+    <div class="ng">Inteligência</div>
+    <div class="ni" onclick="nav('ai')"><span class="ic">🤖</span><span>Assistente IA</span></div>
+    <div class="ng">Sistema</div>
+    <div class="ni" onclick="window.open('https://vitagest.vercel.app','_blank')"><span class="ic">🏥</span><span>Módulo RH</span></div>
+  </nav>
+  <div class="sf-bar"><span class="dot"></span><span>Conectado</span></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="pt" id="pt">Dashboard</div>
+    <div class="tr">
+      <button class="btn bo bsm" onclick="refresh()">🔄 Atualizar</button>
+      <button class="btn bp bsm" id="btnNew" style="display:none" onclick="abrirNovoFunc()">+ Novo</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="sec active" id="sec-dash">
+
+      <!-- ── BLOCO 1: FUNCIONÁRIOS ── -->
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;margin-bottom:18px;align-items:stretch">
+        <div class="sc" style="min-width:160px;display:flex;flex-direction:column;justify-content:center">
+          <div class="si">👥</div>
+          <div class="sl">Funcionários Ativos</div>
+          <div class="sv" id="st-f" style="font-size:2.2rem">–</div>
+          <div class="ss" id="st-f-sub"></div>
+        </div>
+
+        <!-- ── BLOCO 2: FOLHA BRUTA — ÚLTIMOS 3 MESES ── -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><span class="ct">💵 Folha Bruta — Últimos 3 Meses</span></div>
+          <div class="cp" style="padding:14px">
+            <div id="d-folha-hist" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BLOCO 3: IMPOSTOS — ÚLTIMOS 3 MESES ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch">
+          <span class="ct">🏛️ Impostos Pagos — Histórico Real + Previsão</span>
+          <span class="tag" id="d-imp-total-tag"></span>
+        </div>
+        <div class="cp">
+          <div id="d-imp-timeline" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px"></div>
+          <!-- BLOCO UNIFICADO TOTAIS -->
+          <div style="background:linear-gradient(135deg,var(--vd),var(--v));border-radius:10px;padding:16px;color:#fff">
+            <div style="font-size:.68rem;font-weight:800;opacity:.7;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">📦 Consolidado — Total Pago até Hoje</div>
+            <div id="d-consolidado" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BLOCO 4: CUSTO REAL — ÚLTIMOS 3 MESES ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">💰 Custo Real da Operação — Últimos 3 Meses</span></div>
+        <div class="cp">
+          <div id="d-custo-hist" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px"></div>
+        </div>
+      </div>
+
+      <!-- ── BLOCO 5+6: RESERVA + FATURA ── -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+
+        <!-- RESERVA NECESSÁRIA HOJE -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><span class="ct">🏦 Reserva Necessária HOJE — Sem Justa Causa</span></div>
+          <div class="cp">
+            <div style="font-size:1.8rem;font-weight:800;color:var(--dg);font-family:'DM Mono',monospace;margin-bottom:12px" id="st-res">–</div>
+            <div style="font-size:.68rem;color:var(--mu);margin-bottom:10px" id="st-res-mes"></div>
+            <div id="d-res-detalhe" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
+          </div>
+        </div>
+
+        <!-- FATURA PREFEITURA — ÚLTIMOS 3 MESES -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><span class="ct">📋 Fatura Prefeitura — Últimos 3 Meses</span></div>
+          <div class="cp" id="d-fatura-hist"></div>
+        </div>
+      </div>
+
+      <!-- ── BLOCO 7: CUSTO POR FUNCIONÁRIO POR CARGO ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">📊 Custo por Cargo — Média Mensal Real</span></div>
+        <div class="cb" id="d-cargos"><div class="loading"><div class="sp"></div></div></div>
+      </div>
+
+      <!-- ── BLOCO 8: GRÁFICOS ── -->
+      <div class="cr" style="margin-bottom:18px">
+        <div class="cc"><div class="cc-t">📊 Folha × Impostos por Mês</div><canvas id="chEv"></canvas></div>
+        <div class="cc"><div class="cc-t">🥧 Composição do Custo Real</div><canvas id="chCo"></canvas></div>
+      </div>
+
+      <!-- ── BLOCO 9: EVOLUÇÃO RESCISÃO ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch">
+          <span class="ct">⚖️ Evolução da Reserva de Rescisão — Mês a Mês do Contrato</span>
+          <span style="font-size:.72rem;color:var(--mu)">Sem justa causa — equipe atual. Passe o cursor para ver a composição.</span>
+        </div>
+        <div class="cp">
+          <div style="font-size:.76rem;color:var(--mu);margin-bottom:12px">
+            Hoje estamos no <strong id="d-mes-atual" style="color:var(--vd)">–</strong> do contrato.
+            O card <span style="background:var(--dg);color:#fff;padding:1px 6px;border-radius:4px;font-size:.68rem">← HOJE</span> mostra o que precisa estar em caixa agora.
+          </div>
+          <div id="d-resc-timeline" style="overflow-x:auto;padding-bottom:8px;margin-bottom:18px"></div>
+          <div style="font-size:.68rem;font-weight:800;color:var(--dg);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📋 Detalhamento do Mês Atual — Por Funcionário e Por Verba</div>
+          <div id="d-resc-detalhe" class="tw"></div>
+          <div id="d-resc-totais" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FUNDO DE RESERVA -->
+    <div class="sec" id="sec-fundo">
+
+      <!-- ALERTAS -->
+      <div id="fundo-alertas" style="margin-bottom:18px"></div>
+
+      <!-- CONFIGURAÇÃO DO MÊS -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">⚙️ Configurar Mês de Referência</span></div>
+        <div class="cp">
+          <div class="fg fg3">
+            <div class="fgrp"><label>Fatura Recebida (R$)</label><input type="number" id="fr-fat" placeholder="Ex: 130645.67" step="0.01" oninput="calcFundo()"></div>
+            <div class="fgrp"><label>FGTS Pago (R$)</label><input type="number" id="fr-fgts" placeholder="Ex: 4333.57" step="0.01" oninput="calcFundo()"></div>
+            <div class="fgrp"><label>INSS Repassado (R$)</label><input type="number" id="fr-inss" placeholder="Ex: 3844.51" step="0.01" oninput="calcFundo()"></div>
+            <div class="fgrp"><label>ISSQN (R$)</label><input type="number" id="fr-issqn" placeholder="Ex: 2764.17" step="0.01" oninput="calcFundo()"></div>
+            <div class="fgrp"><label>Meses do Contrato</label><input type="number" id="fr-meses" value="3" min="1" oninput="calcFundo()"></div>
+            <div class="fgrp"><label>Tipo de Demissão</label>
+              <select id="fr-tipo" onchange="calcFundo()">
+                <option value="sjc">Sem Justa Causa (multa 40%)</option>
+                <option value="tc">Término de Contrato</option>
+                <option value="pd">Pedido de Demissão</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:.72rem;color:var(--mu)">💡 Preencha com os valores reais do mês para calcular exatamente quanto sobra e quanto guardar.</div>
+        </div>
+      </div>
+
+      <!-- RESUMO GERAL -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+        <div>
+          <div style="font-size:.72rem;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">💵 FLUXO DO MÊS</div>
+          <div id="fundo-fluxo"></div>
+        </div>
+        <div>
+          <div style="font-size:.72rem;font-weight:800;color:var(--dg);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏦 RESERVA NECESSÁRIA</div>
+          <div id="fundo-reserva"></div>
+        </div>
+      </div>
+
+      <!-- CARDS TOTAIS -->
+      <div class="sg" id="fundo-cards" style="grid-template-columns:repeat(4,1fr)"></div>
+
+      <!-- SIMULAÇÃO POR MÊS -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">⚖️ Simulação de Demissão — Mês a Mês</span></div>
+        <div class="cp">
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+            <div class="fgrp"><label>Simular até o mês nº</label><input type="number" id="sim-ate" value="6" min="1" max="24" style="width:80px" oninput="renderSimMeses()"></div>
+            <div style="font-size:.74rem;color:var(--mu)">Mostra o custo total de demitir toda equipe em cada mês</div>
+          </div>
+          <div id="sim-meses-tbl"><div class="loading"><div class="sp"></div></div></div>
+        </div>
+      </div>
+
+      <!-- TABELA POR FUNCIONÁRIO -->
+      <div class="card">
+        <div class="ch"><span class="ct">👥 Detalhamento por Funcionário</span><button class="btn bo bsm" onclick="exportFundo()">📥 CSV</button></div>
+        <div class="cb tw" id="fundo-tbl"><div class="loading"><div class="sp"></div></div></div>
+      </div>
+
+    </div>
+
+    <!-- FUNCIONÁRIOS -->
+    <div class="sec" id="sec-func">
+      <div class="sb">
+        <input type="text" id="sf" placeholder="🔍 Buscar..." oninput="filtFunc()">
+        <select id="ffc" onchange="filtFunc()"><option value="">Todos os cargos</option></select>
+        <select id="ffs" onchange="filtFunc()"><option value="">Todos</option><option>Ativo</option><option>Inativo</option><option>Experiência</option></select>
+      </div>
+      <div class="card"><div class="ch"><span class="ct">Funcionários</span><span id="fc-count" class="tag"></span></div><div class="cb tw" id="tbl-f"><div class="loading"><div class="sp"></div></div></div></div>
+    </div>
+
+    <!-- CARGOS -->
+    <div class="sec" id="sec-cargos">
+      <div class="card"><div class="ch"><span class="ct">🏷️ Cargos Padrão</span><button class="btn bp bsm" onclick="abrirNovoCargo()">+ Novo Cargo</button></div><div class="cp" id="l-cargos"><div class="loading"><div class="sp"></div></div></div></div>
+    </div>
+
+    <!-- FOLHA DETALHADA -->
+    <div class="sec" id="sec-folha">
+      <div class="card"><div class="ch"><span class="ct">💰 Folha de Pagamento — Composição Detalhada</span><button class="btn bo bsm" onclick="exportCSV()">📥 CSV</button></div><div class="cb tw" id="tbl-folha"><div class="loading"><div class="sp"></div></div></div></div>
+    </div>
+
+    <!-- ENCARGOS & IMPOSTOS -->
+    <div class="sec" id="sec-encargos">
+      <div class="sg" id="enc-stats"></div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">🏛️ Encargos Reais — Memória de Cálculo</span></div>
+        <div class="cp">
+          <div style="background:var(--vm);border-radius:9px;padding:14px;margin-bottom:16px;font-size:.78rem;color:var(--vd)">
+            <strong>ℹ️ Regime: Simples Nacional</strong> — A Vitagest não paga INSS Patronal (20%) separado. Esse valor está incluso na guia do Simples. Os encargos reais são: <strong>FGTS (8%)</strong> + <strong>INSS Empregado (descontado e repassado)</strong> + <strong>ISSQN (2% sobre NF)</strong>.
+          </div>
+          <div id="tbl-enc"><div class="loading"><div class="sp"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">📊 Histórico de Tributos Pagos</span></div>
+        <div class="cb tw" id="tbl-trib-hist"><div class="loading"><div class="sp"></div></div></div>
+      </div>
+    </div>
+
+    <!-- PROVISÕES -->
+    <div class="sec" id="sec-provisoes">
+      <div class="sg" id="prov-stats"></div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">📅 Provisões Acumuladas por Funcionário</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <label style="font-size:.72rem;color:var(--mu)">Meses desde admissão:</label>
+            <input type="number" id="prov-meses" value="3" min="1" max="60" style="width:60px" oninput="calcProvisoes()">
+          </div>
+        </div>
+        <div class="cb tw" id="tbl-prov"><div class="loading"><div class="sp"></div></div></div>
+      </div>
+    </div>
+
+    <!-- SALDO DE RESERVA -->
+    <div class="sec" id="sec-reserva">
+
+      <!-- SELETOR DE MÊS -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">📅 Simular demissão no mês:</span></div>
+        <div class="cp">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px" id="res-mes-btns"></div>
+          <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+            <div class="fgrp">
+              <label>Tipo de demissão</label>
+              <select id="res-tipo" onchange="loadReserva()">
+                <option value="sjc">Sem Justa Causa (multa 40% FGTS)</option>
+                <option value="tc">Término de Contrato (sem multa)</option>
+                <option value="pd">Pedido de Demissão (sem multa)</option>
+              </select>
+            </div>
+            <div style="font-size:.74rem;color:var(--mu);margin-top:14px">
+              💡 Clique em um mês para recalcular toda a tabela como se a equipe fosse demitida naquele mês.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDS TOTAIS -->
+      <div class="sg" style="grid-template-columns:repeat(4,1fr)" id="res-stats"></div>
+      <div class="sg" style="grid-template-columns:repeat(4,1fr);margin-top:-10px" id="res-stats2"></div>
+
+      <!-- BANNER TOTAL -->
+      <div class="reserva-card" style="margin-bottom:18px">
+        <div class="reserva-title">💰 Se demitir toda equipe no <span id="res-mes-label">mês selecionado</span> — Total necessário em caixa:</div>
+        <div class="reserva-val" id="res-total">–</div>
+        <div class="reserva-sub" id="res-sub">Memória de cálculo linha por linha abaixo</div>
+      </div>
+
+      <!-- TABELA MEMÓRIA DE CÁLCULO -->
+      <div class="card">
+        <div class="ch">
+          <span class="ct">📋 Memória de Cálculo da Reserva — Por Funcionário</span>
+          <button class="btn bo bsm" onclick="exportReservaCSV()">📥 CSV</button>
+        </div>
+        <div class="cb tw" id="tbl-reserva"><div class="loading"><div class="sp"></div></div></div>
+      </div>
+
+    </div>
+
+    <!-- SIMULADOR RESCISÃO -->
+    <div class="sec" id="sec-rescisao">
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">⚖️ Simulador de Rescisão — Sem Justa Causa</span></div>
+        <div class="cp">
+          <div class="fg">
+            <div class="fgrp"><label>Selecionar Funcionária</label>
+              <select id="r-func" onchange="calcRescisao()"><option value="">Selecione...</option></select>
+            </div>
+            <div class="fgrp"><label>Meses Trabalhados</label>
+              <input type="number" id="r-meses" value="3" min="1" oninput="calcRescisao()">
+            </div>
+          </div>
+          <div id="resc-result" style="margin-top:16px"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">📊 Custo de Rescisão — Toda a Equipe Hoje</span></div>
+        <div class="cb tw" id="tbl-resc-all"><div class="loading"><div class="sp"></div></div></div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div class="sec" id="sec-historico">
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">📤 Importar Novo Mês</span></div>
+        <div class="cp">
+          <div style="background:var(--vm);border-radius:9px;padding:12px;margin-bottom:14px;font-size:.76rem;color:var(--vd)">
+            📋 Ao receber o relatório mensal, faça o upload do arquivo e preencha os totais abaixo.
+          </div>
+          <!-- UPLOAD -->
+          <div style="border:2px dashed var(--v);border-radius:10px;padding:16px;text-align:center;margin-bottom:14px;background:var(--vm);cursor:pointer" onclick="document.getElementById('upload-rel').click()">
+            <div style="font-size:1.4rem;margin-bottom:4px">📎</div>
+            <div style="font-size:.82rem;font-weight:700;color:var(--vd)">Clique para anexar o relatório / fatura do mês</div>
+            <div style="font-size:.7rem;color:var(--mu);margin-top:2px">PDF, imagem, Word — o arquivo fica registrado localmente</div>
+            <input type="file" id="upload-rel" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display:none" onchange="registrarUpload(this)">
+          </div>
+          <div id="upload-info" style="display:none;background:#d4edda;border:1px solid #c3e6cb;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.78rem;color:#155724"></div>
+          <div class="fg fg3" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr">
+            <div class="fgrp"><label>Competência</label><input type="month" id="imp-mes"></div>
+            <div class="fgrp"><label>Total Proventos</label><input type="number" id="imp-prov" placeholder="0.00" step="0.01"></div>
+            <div class="fgrp"><label>Total Descontos</label><input type="number" id="imp-desc" placeholder="0.00" step="0.01"></div>
+            <div class="fgrp"><label>FGTS Pago</label><input type="number" id="imp-fgts" placeholder="0.00" step="0.01"></div>
+            <div class="fgrp"><label>INSS Pago</label><input type="number" id="imp-inss" placeholder="0.00" step="0.01"></div>
+            <div class="fgrp"><label>ISSQN NF</label><input type="number" id="imp-issqn" placeholder="0.00" step="0.01"></div>
+            <div class="fgrp"><label>Nº Funcionários</label><input type="number" id="imp-nf" placeholder="0"></div>
+            <div class="fgrp"><label>Fatura Prefeitura</label><input type="number" id="imp-fat" placeholder="0.00" step="0.01"></div>
+          </div>
+          <div class="fa"><button class="btn bp" onclick="salvarHistorico()">💾 Salvar Mês</button></div>
+        </div>
+      </div>
+      <div class="card"><div class="ch"><span class="ct">📋 Histórico de Folhas</span></div><div class="cp"><div class="ht" id="hist-lista"><div class="loading"><div class="sp"></div></div></div></div></div>
+    </div>
+
+    <!-- PROJEÇÃO -->
+    <div class="sec" id="sec-projecao">
+      <div class="card" style="margin-bottom:18px">
+        <div class="ch"><span class="ct">⚙️ Parâmetros da Projeção</span></div>
+        <div class="cp">
+          <div class="fg fg3">
+            <div class="fgrp"><label>Reajuste Salarial/Ano (%)</label><input type="number" id="pr-reaj" value="5" step="0.1" oninput="gerarProj()"></div>
+            <div class="fgrp"><label>Novos Func./Ano</label><input type="number" id="pr-cresc" value="0" oninput="gerarProj()"></div>
+            <div class="fgrp"><label>Inflação ISSQN (%/ano)</label><input type="number" id="pr-infl" value="4" step="0.1" oninput="gerarProj()"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc" style="margin-bottom:18px"><div class="cc-t">📈 Projeção de Custo Total — 5 Anos</div><canvas id="chProj" style="max-height:250px"></canvas></div>
+      <div class="card"><div class="ch"><span class="ct">📊 Detalhamento Anual</span></div><div class="cb tw" id="tbl-proj"><div class="loading"><div class="sp"></div></div></div></div>
+    </div>
+
+    <!-- IA -->
+    <div class="sec" id="sec-ai">
+      <div class="card">
+        <div class="ch"><span class="ct">🤖 Assistente Financeiro IA — Vitagest</span><span class="tag">Claude AI</span></div>
+        <div class="ai-wrap">
+          <div class="ai-msgs" id="ai-msgs">
+            <div class="ai-msg bot">Olá! Sou o assistente financeiro da Vitagest. Posso responder perguntas sobre folha, encargos, rescisões, provisões e projeções. O que deseja saber?</div>
+          </div>
+          <div class="ai-quick">
+            <span class="aq" onclick="aiPerguntar('Quanto custa demitir a Carmen Lucia hoje?')">💸 Custo rescisão Carmen</span>
+            <span class="aq" onclick="aiPerguntar('Quanto preciso ter em caixa para todas as rescisões?')">🏦 Reserva total rescisões</span>
+            <span class="aq" onclick="aiPerguntar('Qual o custo real mensal da equipe de enfermagem?')">💊 Custo enfermagem</span>
+            <span class="aq" onclick="aiPerguntar('Como está a evolução da folha nos últimos meses?')">📊 Evolução da folha</span>
+            <span class="aq" onclick="aiPerguntar('Qual o impacto de contratar mais 2 técnicas de enfermagem?')">➕ Impacto nova contratação</span>
+          </div>
+          <div class="ai-input">
+            <input type="text" id="ai-inp" placeholder="Faça uma pergunta financeira..." onkeydown="if(event.key==='Enter')aiEnviar()">
+            <button class="btn bp" onclick="aiEnviar()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAIS -->
+<div class="mb" id="modal"><div class="modal"><div class="mh"><span class="mt" id="mT">–</span><button class="mc" onclick="closeModal()">✕</button></div><div id="mB"></div></div></div>
+<div class="mb" id="modal2"><div class="modal"><div class="mh"><span class="mt" id="m2T">–</span><button class="mc" onclick="document.getElementById('modal2').classList.remove('open')">✕</button></div><div id="m2B"></div></div></div>
+<div id="toast"></div>
+
+<script>
+const SB_URL='https://nanynbwmivtyopinptfr.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hbnluYndtaXZ0eW9waW5wdGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NjU3ODYsImV4cCI6MjA5MzM0MTc4Nn0.T9hLvQcRJ8Gsa9uUVeMrQ4K7qkL1Ib3ZDoY0eRYoD2Q';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+// DADOS REAIS HISTÓRICOS
+const HIST_REAL=[
+  {comp:'2026-02',prov:39732.57,desc:3372.90,liq:36359.67,fgts:3178.55,inss:3372.90,issqn:1929.27,fat:96463.67,nf:13},
+  {comp:'2026-03',prov:55682.50,desc:5820.53,liq:49861.97,fgts:4333.57,inss:3844.51,issqn:2612.91,fat:130645.67,nf:23},
+  {comp:'2026-04',prov:62407.07,desc:10020.88,liq:52386.19,fgts:4698.46,inss:3411.53,issqn:2764.17,fat:139208.50,nf:25}
+];
+
+// ENCARGOS REAIS — SIMPLES NACIONAL
+// Não há INSS Patronal separado (incluso no Simples)
+// FGTS = 8% da remuneração bruta
+// INSS empregado = descontado e repassado (não é custo da empresa)
+// ISSQN = 2% sobre NF (custo real da empresa)
+const FGTS_PERC=0.08;
+const D13=1/12, FER=1/12, TER=(1/12)*(1/3);
+
+let allFunc=[],allCargos=[],allHist=[];
+let chEv,chCo,chPr;
+
+function calc(r){
+  const sal=+r.salario_base||0,ins=+r.insalubridade||0,vt=+r.vale_transporte||0,va=+r.vale_alimentacao||0;
+  const bruto=sal+ins;
+  const fgts=bruto*FGTS_PERC;
+  const d13=bruto*D13,fer=bruto*FER,ter=bruto*TER;
+  const custoMensal=bruto+fgts+vt+va+d13+fer+ter;
+  return{sal,ins,vt,va,bruto,fgts,d13,fer,ter,custoMensal,custoAnual:custoMensal*12};
+}
+
+// RESCISÃO SEM JUSTA CAUSA
+function calcResc(r,meses){
+  const c=calc(r);
+  const bruto=c.bruto;
+  const saldo13=bruto*(meses%12)/12;
+  const saldoFer=bruto*(meses%12)/12;
+  const tercoFer=saldoFer/3;
+  const avisoPrevio=bruto; // 1 mês + 3 dias por ano
+  const fgtsSaldo=bruto*FGTS_PERC*meses;
+  const multaFGTS=fgtsSaldo*0.40;
+  const total=saldo13+saldoFer+tercoFer+avisoPrevio+multaFGTS;
+  return{saldo13,saldoFer,tercoFer,avisoPrevio,fgtsSaldo,multaFGTS,total};
+}
+
+const secTitles={dash:'Dashboard',fundo:'Fundo de Reserva',func:'Funcionários',cargos:'Cargos Padrão',folha:'Folha Detalhada',encargos:'Encargos & Impostos',provisoes:'Provisões',reserva:'Saldo de Reserva',rescisao:'Simulador de Rescisão',historico:'Histórico Mensal',projecao:'Projeção 5 Anos',ai:'Assistente IA'};
+
+function nav(s){
+  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('active'));
+  const ni=document.querySelector(`.ni[onclick="nav('${s}')"]`);if(ni)ni.classList.add('active');
+  document.querySelectorAll('.sec').forEach(e=>e.classList.remove('active'));
+  document.getElementById('sec-'+s).classList.add('active');
+  document.getElementById('pt').textContent=secTitles[s]||s;
+  document.getElementById('btnNew').style.display=s==='func'?'':'none';
+  loadSec(s);
+}
+function refresh(){loadSec(document.querySelector('.sec.active')?.id?.replace('sec-','')||'dash');}
+
+async function qry(t,asc=true,ord='id'){const{data,error}=await sb.from(t).select('*').order(ord,{ascending:asc});if(error){toast('Erro: '+error.message,true);return[];}return data||[];}
+
+// DASHBOARD COMPLETO
+async function loadDash(){
+  allFunc=await qry('financeiro',true,'nome');
+  allCargos=await qry('cargos_padrao',true,'nome');
+  allHist=await qry('historico_folha',true,'competencia');
+
+  const HIST=[
+    {comp:'2026-02',prov:39732.57,desc:3372.90,liq:36359.67,fgts:3178.55,inss:3372.90,issqn:1929.27,fat:96463.67,nf:13},
+    {comp:'2026-03',prov:55682.50,desc:5820.53,liq:49861.97,fgts:4333.57,inss:3844.51,issqn:2612.91,fat:130645.67,nf:23},
+    {comp:'2026-04',prov:62407.07,desc:10020.88,liq:52386.19,fgts:4698.46,inss:3411.53,issqn:2764.17,fat:139208.50,nf:25}
+  ];
+  allHist.forEach(h=>{if(!HIST.find(x=>x.comp===h.competencia))HIST.push({comp:h.competencia,prov:h.total_proventos,desc:h.total_descontos,liq:h.liquido_geral,fgts:h.fgts_pago||0,inss:h.inss_pago||0,issqn:h.issqn_pago||0,fat:h.fatura_prefeitura||0,nf:h.num_funcionarios||0});});
+  HIST.sort((a,b)=>a.comp.localeCompare(b.comp));
+
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  let folha=0,fgts=0,provisoes=0;
+  ativos.forEach(r=>{const c=calc(r);folha+=c.bruto;fgts+=c.fgts;provisoes+=c.d13+c.fer+c.ter;});
+
+  const inicioContrato=new Date('2026-02-02');
+  const mesAtual=Math.max(1,Math.round((new Date()-inicioContrato)/2592000000));
+
+  let reservaTotal=0,t13=0,tFer=0,tTer=0,tAviso=0,tFgtsAcum=0,tMulta=0;
+  ativos.forEach(r=>{
+    const c=calc(r);
+    const fgtsMes=c.fgts,fgtsAcum=fgtsMes*mesAtual,multa=fgtsAcum*0.40;
+    const avos=mesAtual%12||12;
+    const p13=c.bruto*avos/12,pFer=p13,tFer2=pFer/3,aviso=c.bruto;
+    const total=p13+pFer+tFer2+aviso+multa;
+    reservaTotal+=total;t13+=p13;tFer+=pFer;tTer+=tFer2;tAviso+=aviso;tFgtsAcum+=fgtsAcum;tMulta+=multa;
+  });
+
+  const ult3=HIST.slice(-3);
+
+  // Bloco 1: Funcionários
+  document.getElementById('st-f').textContent=ativos.length;
+  const nEnf=ativos.filter(r=>r.cargo?.includes('Enferm')).length;
+  const nBucal=ativos.filter(r=>r.cargo?.includes('Saúde')||r.cargo?.includes('Bucal')).length;
+  const nVisit=ativos.filter(r=>r.cargo?.includes('Visit')).length;
+  document.getElementById('st-f-sub').textContent=`${nEnf} enf. | ${nBucal} bucal | ${nVisit} visit.`;
+
+  // Bloco 2: Folha últimos 3 meses
+  document.getElementById('d-folha-hist').innerHTML=ult3.map((h,i)=>{
+    const isUlt=i===ult3.length-1;
+    const vp=i>0?((h.prov-ult3[i-1].prov)/ult3[i-1].prov*100).toFixed(1):null;
+    return`<div style="background:${isUlt?'var(--vm)':'var(--bg)'};border:${isUlt?'1.5px solid var(--v)':'1px solid var(--bd)'};border-radius:10px;padding:14px">
+      <div style="font-size:.7rem;font-weight:700;color:${isUlt?'var(--vd)':'var(--mu)'};margin-bottom:6px">${fmtMes(h.comp)}${isUlt?' <span style="font-size:.58rem;background:var(--v);color:#fff;padding:1px 6px;border-radius:8px">Último</span>':''}</div>
+      <div style="font-size:1.1rem;font-weight:800;color:var(--vd);font-family:\'DM Mono\',monospace">${brl(h.prov)}</div>
+      <div style="font-size:.68rem;color:var(--mu);margin-top:4px">${h.nf} funcionários</div>
+      ${vp!==null?`<div style="font-size:.68rem;font-weight:700;color:${+vp>=0?'#27ae60':'var(--dg)'};margin-top:3px">${+vp>=0?'▲':'▼'} ${Math.abs(vp)}% vs mês ant.</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Bloco 3: Impostos
+  renderDashImpostos(HIST);
+
+  // Bloco 4: Custo real
+  document.getElementById('d-custo-hist').innerHTML=ult3.map((h,i)=>{
+    const isUlt=i===ult3.length-1;
+    const custoReal=h.prov+(h.fgts||0)+(h.issqn||0)+provisoes;
+    return`<div style="background:${isUlt?'var(--vm)':'var(--bg)'};border:${isUlt?'1.5px solid var(--v)':'1px solid var(--bd)'};border-radius:10px;padding:14px">
+      <div style="font-size:.7rem;font-weight:700;color:${isUlt?'var(--vd)':'var(--mu)'};margin-bottom:8px">${fmtMes(h.comp)}${isUlt?' <span style="font-size:.58rem;background:var(--v);color:#fff;padding:1px 6px;border-radius:8px">Último</span>':''}</div>
+      <div style="font-size:.68rem;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px"><span>Salários</span><span style="font-family:\'DM Mono\',monospace">${brl(h.prov)}</span></div>
+      <div style="font-size:.68rem;color:var(--wn);display:flex;justify-content:space-between;margin-bottom:3px"><span>FGTS (8%)</span><span style="font-family:\'DM Mono\',monospace">${brl(h.fgts||0)}</span></div>
+      <div style="font-size:.68rem;color:#8e44ad;display:flex;justify-content:space-between;margin-bottom:3px"><span>ISSQN (2%)</span><span style="font-family:\'DM Mono\',monospace">${brl(h.issqn||0)}</span></div>
+      <div style="font-size:.68rem;color:#2980b9;display:flex;justify-content:space-between;margin-bottom:6px"><span>Provisões (est.)</span><span style="font-family:\'DM Mono\',monospace">${brl(provisoes)}</span></div>
+      <div style="padding:8px;background:#fff;border-radius:7px;display:flex;justify-content:space-between">
+        <span style="font-size:.72rem;font-weight:700">Total Real</span>
+        <span style="font-size:.82rem;font-weight:800;font-family:\'DM Mono\',monospace;color:var(--vd)">${brl(custoReal)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Bloco 5: Reserva discriminada
+  document.getElementById('st-res').textContent=brl(reservaTotal);
+  document.getElementById('st-res-mes').textContent=`${mesAtual}º mês do contrato — sem justa causa | ${ativos.length} funcionários`;
+  document.getElementById('d-res-detalhe').innerHTML=
+    bkMini2('13º Proporcional',brl(t13))+
+    bkMini2('Férias Proporcionais',brl(tFer))+
+    bkMini2('1/3 de Férias',brl(tTer))+
+    bkMini2('Aviso Prévio',brl(tAviso),'var(--wn)')+
+    bkMini2('FGTS Acumulado',brl(tFgtsAcum),'var(--wn)')+
+    bkMini2('Multa FGTS 40%',brl(tMulta),'var(--dg)');
+
+  // Bloco 6: Fatura
+  document.getElementById('d-fatura-hist').innerHTML='<div style="padding:0 4px">'+
+    ult3.map((h,i)=>{
+      const isUlt=i===ult3.length-1;
+      return`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:${i<ult3.length-1?'1px solid var(--bd)':'none'}">
+        <div>
+          <div style="font-size:.8rem;font-weight:700;color:${isUlt?'var(--vd)':'var(--tx)'}">${fmtMes(h.comp)}${isUlt?' <span style="font-size:.6rem;background:var(--v);color:#fff;padding:1px 6px;border-radius:8px">Último</span>':''}</div>
+          <div style="font-size:.68rem;color:var(--mu)">${h.nf} funcionários faturados</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.94rem;font-weight:800;font-family:\'DM Mono\',monospace;color:${isUlt?'var(--vd)':'var(--tx)'}">${brl(h.fat)}</div>
+          <div style="font-size:.62rem;color:#8e44ad">ISS: ${brl(h.issqn||0)}</div>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+
+  // Bloco 7: Custo por cargo
+  renderDashCargos(ativos);
+
+  // Bloco 8: Gráficos
+  renderCharts(HIST,ativos,fgts,provisoes,folha);
+
+  // Bloco 9: Evolução rescisão
+  document.getElementById('d-mes-atual').textContent=`${mesAtual}º mês`;
+  renderDashRescisao(ativos,mesAtual,{t13,tFer,tTer,tAviso,tFgtsAcum,tMulta,reservaTotal});
+}
+
+function bkMini(label,valor,cor='var(--mu)'){
+  return`<div style="display:flex;justify-content:space-between;margin-bottom:4px">
+    <span style="font-size:.68rem;color:var(--mu)">${label}</span>
+    <span style="font-size:.72rem;font-weight:700;font-family:'DM Mono',monospace;color:${cor}">${valor}</span>
+  </div>`;
+}
+
+function bkMini2(label,valor,cor='var(--vd)'){
+  return`<div style="background:var(--bg);border-radius:7px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:.68rem;color:var(--mu)">${label}</span>
+    <span style="font-size:.76rem;font-weight:700;font-family:'DM Mono',monospace;color:${cor}">${valor}</span>
+  </div>`;
+}
+
+
+function renderCharts(hist,ativos,fgts,provisoes,folha){
+  if(chEv)chEv.destroy();
+  if(chCo)chCo.destroy();
+
+  const labels=hist.map(h=>fmtMes(h.comp));
+  const provArr=hist.map(h=>h.prov);
+  const fgtsArr=hist.map(h=>h.fgts||0);
+  const inssArr=hist.map(h=>h.inss||0);
+  const issArr=hist.map(h=>h.issqn||0);
+
+  chEv=new Chart(document.getElementById('chEv'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Folha Bruta',data:provArr,backgroundColor:'rgba(26,122,74,0.7)',borderRadius:4},
+      {label:'FGTS',data:fgtsArr,backgroundColor:'rgba(230,126,34,0.7)',borderRadius:4},
+      {label:'INSS',data:inssArr,backgroundColor:'rgba(41,128,185,0.7)',borderRadius:4},
+      {label:'ISSQN',data:issArr,backgroundColor:'rgba(142,68,173,0.7)',borderRadius:4}
+    ]},
+    options:{responsive:true,plugins:{legend:{labels:{font:{size:10}}}},scales:{x:{stacked:false},y:{ticks:{callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}
+  });
+
+  const enc=fgts;
+  chCo=new Chart(document.getElementById('chCo'),{
+    type:'doughnut',
+    data:{labels:['Salários','Insalubridade','FGTS (8%)','V.Transporte','V.Alimentação','Prov.13º','Prov.Férias','Prov.1/3'],
+      datasets:[{data:[
+        ativos.reduce((a,r)=>a+(+r.salario_base||0),0),
+        ativos.reduce((a,r)=>a+(+r.insalubridade||0),0),
+        enc,
+        ativos.reduce((a,r)=>a+(+r.vale_transporte||0),0),
+        ativos.reduce((a,r)=>a+(+r.vale_alimentacao||0),0),
+        ativos.reduce((a,r)=>a+calc(r).d13,0),
+        ativos.reduce((a,r)=>a+calc(r).fer,0),
+        ativos.reduce((a,r)=>a+calc(r).ter,0)
+      ],backgroundColor:['#1a7a4a','#27ae60','#e67e22','#2980b9','#16a085','#8e44ad','#c0392b','#f39c12'],borderWidth:2}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:9},padding:6}}}}
+  });
+}
+
+function renderDashCargos(ativos){
+  const el=document.getElementById('d-cargos');
+  const m={};
+  ativos.forEach(r=>{
+    const k=r.cargo||'–';
+    if(!m[k])m[k]={n:0,custo:0,salBruto:0,fgts:0,prov:0};
+    const c=calc(r);
+    m[k].n++;m[k].custo+=c.custoMensal;m[k].salBruto+=c.bruto;m[k].fgts+=c.fgts;m[k].prov+=c.d13+c.fer+c.ter;
+  });
+  if(!Object.keys(m).length){el.innerHTML='<div class="es"><div class="ei">👥</div><p>Sem dados</p></div>';return;}
+  el.innerHTML=`<table><thead><tr>
+    <th>Cargo</th><th>Qtd</th><th>Sal.Bruto/func.</th><th>FGTS/func.</th><th>Provisão/func.</th><th>Custo Total/mês</th><th>Custo/ano</th>
+  </tr></thead><tbody>
+    ${Object.entries(m).map(([k,v])=>`<tr>
+      <td><strong>${k}</strong></td><td>${v.n}</td>
+      <td class="mono">${brl(v.salBruto/v.n)}</td>
+      <td class="mono" style="color:var(--wn)">${brl(v.fgts/v.n)}</td>
+      <td class="mono" style="color:#2980b9">${brl(v.prov/v.n)}</td>
+      <td class="mono"><strong>${brl(v.custo)}</strong></td>
+      <td class="mono">${brl(v.custo*12)}</td>
+    </tr>`).join('')}
+    <tr style="background:var(--vm);font-weight:700">
+      <td>TOTAL</td><td>${ativos.length}</td><td></td><td></td><td></td>
+      <td class="mono">${brl(Object.values(m).reduce((a,v)=>a+v.custo,0))}</td>
+      <td class="mono">${brl(Object.values(m).reduce((a,v)=>a+v.custo*12,0))}</td>
+    </tr>
+  </tbody></table>`;
+}
+
+function renderDashTrib(h){
+  const el=document.getElementById('d-trib');
+  if(!h||!h.comp){el.innerHTML='<div class="es"><div class="ei">📊</div><p>Sem dados</p></div>';return;}
+  const tot=(h.fgts||0)+(h.inss||0)+(h.issqn||0);
+  el.innerHTML=`<div style="padding:14px">
+    <div class="bk"><span class="bk-l">🏛️ FGTS (8% bruto)</span><span class="bk-v">${brl(h.fgts)}</span></div>
+    <div class="bk"><span class="bk-l">📋 INSS Empregado (repasse)</span><span class="bk-v">${brl(h.inss)}</span></div>
+    <div class="bk"><span class="bk-l">🏙️ ISSQN (2% NF)</span><span class="bk-v">${brl(h.issqn)}</span></div>
+    <div class="bk-total"><span style="font-weight:700;font-size:.8rem">Total Tributos ${fmtMes(h.comp)}</span><span style="font-size:1rem;font-weight:700;font-family:'DM Mono',monospace">${brl(tot)}</span></div>
+  </div>`;
+}
+
+function renderDashImpostos(hist){
+  if(!hist.length) return;
+  let totalFGTS=0,totalINSS=0,totalISSQN=0,totalGeral=0,totalFolha=0;
+  hist.forEach(h=>{totalFGTS+=h.fgts||0;totalINSS+=h.inss||0;totalISSQN+=h.issqn||0;totalGeral+=(h.fgts||0)+(h.inss||0)+(h.issqn||0);totalFolha+=h.prov||0;});
+  const n=hist.length;
+  const mFGTS=totalFGTS/n,mINSS=totalINSS/n,mISS=totalISSQN/n,mTot=totalGeral/n;
+
+  // Timeline — últimos 3 meses
+  const ult3=hist.slice(-3);
+  document.getElementById('d-imp-timeline').innerHTML=ult3.map((h,i)=>{
+    const tot=(h.fgts||0)+(h.inss||0)+(h.issqn||0);
+    const isUlt=i===ult3.length-1;
+    return`<div style="background:${isUlt?'var(--vm)':'var(--bg)'};border:${isUlt?'1.5px solid var(--v)':'1px solid var(--bd)'};border-radius:10px;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:.8rem;font-weight:700;color:${isUlt?'var(--vd)':'var(--tx)'}">${fmtMes(h.comp)}${isUlt?' <span style="font-size:.58rem;background:var(--v);color:#fff;padding:1px 6px;border-radius:8px">Último</span>':''}</span>
+        <span style="font-size:.82rem;font-weight:700;font-family:\'DM Mono\',monospace;color:var(--dg)">${brl(tot)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <div style="background:#fff;border-radius:6px;padding:8px;text-align:center">
+          <div style="font-size:.58rem;color:var(--mu);margin-bottom:2px">FGTS</div>
+          <div style="font-size:.76rem;font-weight:700;color:var(--wn);font-family:\'DM Mono\',monospace">${brl(h.fgts||0)}</div>
+        </div>
+        <div style="background:#fff;border-radius:6px;padding:8px;text-align:center">
+          <div style="font-size:.58rem;color:var(--mu);margin-bottom:2px">INSS</div>
+          <div style="font-size:.76rem;font-weight:700;color:#2980b9;font-family:\'DM Mono\',monospace">${brl(h.inss||0)}</div>
+        </div>
+        <div style="background:#fff;border-radius:6px;padding:8px;text-align:center">
+          <div style="font-size:.58rem;color:var(--mu);margin-bottom:2px">ISSQN</div>
+          <div style="font-size:.76rem;font-weight:700;color:#8e44ad;font-family:\'DM Mono\',monospace">${brl(h.issqn||0)}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Tag total
+  document.getElementById('d-imp-total-tag').textContent=`Total acumulado: ${brl(totalGeral)}`;
+
+  // Consolidado
+  document.getElementById('d-consolidado').innerHTML=`
+    <div style="text-align:center">
+      <div style="font-size:.6rem;color:rgba(255,255,255,.65);margin-bottom:4px">FGTS Total</div>
+      <div style="font-size:.96rem;font-weight:800;color:var(--wn);font-family:'DM Mono',monospace">${brl(totalFGTS)}</div>
+      <div style="font-size:.58rem;color:rgba(255,255,255,.5);margin-top:2px">média ${brl(mFGTS)}/mês</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:.6rem;color:rgba(255,255,255,.65);margin-bottom:4px">INSS Total</div>
+      <div style="font-size:.96rem;font-weight:800;color:#74b9ff;font-family:'DM Mono',monospace">${brl(totalINSS)}</div>
+      <div style="font-size:.58rem;color:rgba(255,255,255,.5);margin-top:2px">média ${brl(mINSS)}/mês</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:.6rem;color:rgba(255,255,255,.65);margin-bottom:4px">ISSQN Total</div>
+      <div style="font-size:.96rem;font-weight:800;color:#a29bfe;font-family:'DM Mono',monospace">${brl(totalISSQN)}</div>
+      <div style="font-size:.58rem;color:rgba(255,255,255,.5);margin-top:2px">média ${brl(mISS)}/mês</div>
+    </div>
+    <div style="text-align:center;border-left:1px solid rgba(255,255,255,.2);padding-left:12px">
+      <div style="font-size:.6rem;color:rgba(255,255,255,.65);margin-bottom:4px">TOTAL IMPOSTOS ACUM.</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fff;font-family:'DM Mono',monospace">${brl(totalGeral)}</div>
+      <div style="font-size:.58rem;color:rgba(255,255,255,.5);margin-top:2px">folha acum: ${brl(totalFolha)}</div>
+    </div>`;
+}
+
+function renderDashRescisao(ativos,mesAtual,totais){
+  if(!ativos.length) return;
+
+  // Calcular dados por mês para tooltip
+  function calcMes(m){
+    let t13=0,tFer=0,tTer=0,tAviso=0,tFgts=0,tMulta=0,tResc=0;
+    ativos.forEach(r=>{
+      const c=calc(r);
+      const fgtsAcum=c.fgts*m, multa=fgtsAcum*0.40;
+      const avos=m%12||12, p13=c.bruto*avos/12, pFer=p13, tFer2=pFer/3, aviso=c.bruto;
+      t13+=p13;tFer+=pFer;tTer+=tFer2;tAviso+=aviso;tFgts+=fgtsAcum;tMulta+=multa;
+      tResc+=p13+pFer+tFer2+aviso+multa;
+    });
+    return{t13,tFer,tTer,tAviso,tFgts,tMulta,tResc};
+  }
+
+  // Timeline com tooltip embutido
+  const mesesExibir=Math.max(mesAtual+3,8);
+  const cells=Array.from({length:Math.min(mesesExibir,24)},(_,i)=>{
+    const m=i+1;
+    const d=calcMes(m);
+    const isAtual=m===mesAtual, passado=m<mesAtual;
+    const bg=isAtual?'var(--dg)':passado?'#f8d7da':'var(--bg)';
+    const border=isAtual?'2px solid var(--dg)':'1px solid var(--bd)';
+    const cor=isAtual?'#fff':passado?'var(--dg)':'var(--vd)';
+    const corMu=isAtual?'rgba(255,255,255,.65)':'var(--mu)';
+    return`<div style="min-width:130px;background:${bg};border:${border};border-radius:10px;padding:10px 12px;flex-shrink:0;position:relative;cursor:pointer"
+      onmouseenter="this.querySelector('.tt').style.display='block'"
+      onmouseleave="this.querySelector('.tt').style.display='none'">
+      <div style="font-size:.62rem;font-weight:700;color:${corMu};margin-bottom:4px">${m}º mês${isAtual?' 📍 HOJE':passado?' ✓':''}</div>
+      <div style="font-size:.88rem;font-weight:800;font-family:'DM Mono',monospace;color:${cor}">${brl(d.tResc)}</div>
+      <div style="font-size:.56rem;color:${corMu};margin-top:3px">rescisão total</div>
+      <div class="tt" style="display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);z-index:99;background:#1a2e22;color:#fff;border-radius:10px;padding:12px 14px;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.3);margin-top:6px">
+        <div style="font-size:.68rem;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">${m}º mês — Composição</div>
+        ${ttRow('13º Proporcional',d.t13)}
+        ${ttRow('Férias Prop.',d.tFer)}
+        ${ttRow('1/3 Férias',d.tTer)}
+        ${ttRow('Aviso Prévio',d.tAviso,'var(--wn)')}
+        ${ttRow('FGTS Acumulado',d.tFgts,'#74b9ff')}
+        ${ttRow('Multa FGTS 40%',d.tMulta,'#ff7675')}
+        <div style="border-top:1px solid rgba(255,255,255,.2);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between">
+          <span style="font-size:.72rem;font-weight:700">TOTAL</span>
+          <span style="font-size:.78rem;font-weight:800;font-family:'DM Mono',monospace;color:#fff">${brl(d.tResc)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('d-resc-timeline').innerHTML=`<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px">${cells}</div>`;
+
+  // Tabela detalhada mês atual
+  const avos=mesAtual%12||12;
+  const rows=ativos.map(r=>{
+    const c=calc(r);
+    const fgtsAcum=c.fgts*mesAtual, multa=fgtsAcum*0.40;
+    const p13=c.bruto*avos/12, pFer=p13, tFerI=pFer/3, aviso=c.bruto;
+    const total=p13+pFer+tFerI+aviso+multa;
+    return`<tr>
+      <td><strong style="font-size:.74rem">${r.nome||'–'}</strong></td>
+      <td style="font-size:.68rem">${r.cargo?.split(' ').slice(0,2).join(' ')||'–'}</td>
+      <td class="mono">${brl(c.bruto)}</td>
+      <td class="mono" style="color:var(--wn)">${brl(fgtsAcum)}</td>
+      <td class="mono" style="color:var(--dg)">${brl(multa)}</td>
+      <td class="mono">${brl(p13)}</td>
+      <td class="mono">${brl(pFer)}</td>
+      <td class="mono">${brl(tFerI)}</td>
+      <td class="mono">${brl(aviso)}</td>
+      <td style="background:var(--vm)"><strong style="font-family:'DM Mono',monospace;font-size:.76rem;color:var(--dg)">${brl(total)}</strong></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('d-resc-detalhe').innerHTML=`<table><thead><tr style="background:#fdf2f2">
+    <th>Funcionário</th><th>Cargo</th><th>Sal.Bruto</th>
+    <th style="color:var(--wn)">FGTS Acum.</th><th style="color:var(--dg)">Multa 40%</th>
+    <th>13º Prop.</th><th>Férias Prop.</th><th>1/3 Férias</th><th>Aviso Prévio</th>
+    <th style="color:var(--dg)">TOTAL</th>
+  </tr></thead><tbody>${rows}
+    <tr style="background:var(--vm);font-weight:700">
+      <td colspan="3">TOTAL GERAL (${mesAtual}º mês)</td>
+      <td class="mono" style="color:var(--wn)">${brl(totais.tFgtsAcum)}</td>
+      <td class="mono" style="color:var(--dg)">${brl(totais.tMulta)}</td>
+      <td class="mono">${brl(totais.t13)}</td>
+      <td class="mono">${brl(totais.tFer)}</td>
+      <td class="mono">${brl(totais.tTer)}</td>
+      <td class="mono">${brl(totais.tAviso)}</td>
+      <td style="background:#fdf2f2"><strong style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--dg)">${brl(totais.reservaTotal)}</strong></td>
+    </tr>
+  </tbody></table>`;
+
+  document.getElementById('d-resc-totais').innerHTML=`
+    <div style="background:#fdf2f2;border:1px solid #f5c6c6;border-radius:9px;padding:12px;text-align:center">
+      <div style="font-size:.58rem;color:var(--mu);margin-bottom:3px">13º + Férias + 1/3</div>
+      <div style="font-size:.9rem;font-weight:700;color:var(--vd);font-family:'DM Mono',monospace">${brl(totais.t13+totais.tFer+totais.tTer)}</div>
+    </div>
+    <div style="background:#fdf2f2;border:1px solid #f5c6c6;border-radius:9px;padding:12px;text-align:center">
+      <div style="font-size:.58rem;color:var(--mu);margin-bottom:3px">Aviso Prévio</div>
+      <div style="font-size:.9rem;font-weight:700;color:var(--wn);font-family:'DM Mono',monospace">${brl(totais.tAviso)}</div>
+    </div>
+    <div style="background:#fdf2f2;border:1px solid #f5c6c6;border-radius:9px;padding:12px;text-align:center">
+      <div style="font-size:.58rem;color:var(--mu);margin-bottom:3px">Multa FGTS 40%</div>
+      <div style="font-size:.9rem;font-weight:700;color:var(--dg);font-family:'DM Mono',monospace">${brl(totais.tMulta)}</div>
+    </div>
+    <div style="background:var(--dg);border-radius:9px;padding:12px;text-align:center">
+      <div style="font-size:.58rem;color:rgba(255,255,255,.7);margin-bottom:3px">RESERVA TOTAL HOJE</div>
+      <div style="font-size:1rem;font-weight:800;color:#fff;font-family:'DM Mono',monospace">${brl(totais.reservaTotal)}</div>
+    </div>`;
+}
+
+function ttRow(l,v,cor='rgba(255,255,255,.85)'){
+  return`<div style="display:flex;justify-content:space-between;margin-bottom:5px">
+    <span style="font-size:.68rem;color:rgba(255,255,255,.6)">${l}</span>
+    <span style="font-size:.7rem;font-weight:700;font-family:'DM Mono',monospace;color:${cor}">${brl(v)}</span>
+  </div>`;
+}
+
+async function loadSec(s){
+  if(s==='dash'){loadDash();return;}
+  if(s==='fundo'){await loadFundo();return;}
+  if(s==='func'){await loadFunc();return;}
+  if(s==='cargos'){await loadCargos();return;}
+  if(s==='folha'){await loadFolha();return;}
+  if(s==='encargos'){await loadEncargos();return;}
+  if(s==='provisoes'){await loadProvisoes();return;}
+  if(s==='reserva'){await loadReserva();return;}
+  if(s==='rescisao'){await loadRescisao();return;}
+  if(s==='historico'){await loadHistorico();return;}
+  if(s==='projecao'){await loadProjecao();return;}
+}
+
+// ══════════════════════════════════════
+// FUNDO DE RESERVA
+// ══════════════════════════════════════
+async function loadFundo(){
+  if(!allFunc.length) allFunc=await qry('financeiro',true,'nome');
+  // Pré-preencher com último mês real
+  const ult=HIST_REAL[HIST_REAL.length-1];
+  if(ult){
+    document.getElementById('fr-fat').value=ult.fat||'';
+    document.getElementById('fr-fgts').value=ult.fgts||'';
+    document.getElementById('fr-inss').value=ult.inss||'';
+    document.getElementById('fr-issqn').value=ult.issqn||'';
+  }
+  calcFundo();
+}
+
+function calcFundo(){
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  if(!ativos.length) return;
+
+  const fat=parseFloat(document.getElementById('fr-fat')?.value)||0;
+  const fgtsPago=parseFloat(document.getElementById('fr-fgts')?.value)||0;
+  const inssPago=parseFloat(document.getElementById('fr-inss')?.value)||0;
+  const issqnPago=parseFloat(document.getElementById('fr-issqn')?.value)||0;
+  const meses=parseInt(document.getElementById('fr-meses')?.value)||3;
+  const tipo=document.getElementById('fr-tipo')?.value||'sjc';
+
+  // Totais da folha
+  let totalSalBruto=0, totalFGTS=0, totalProv=0, totalVT=0, totalVA=0;
+  ativos.forEach(r=>{
+    const c=calc(r);
+    totalSalBruto+=c.bruto;
+    totalFGTS+=c.fgts;
+    totalProv+=c.d13+c.fer+c.ter;
+    totalVT+=c.vt; totalVA+=c.va;
+  });
+
+  // Custos reais que saem do caixa
+  const custoSalarios=totalSalBruto; // pago aos funcionários
+  const custoFGTS=totalFGTS;         // pago à CEF (custo empresa)
+  const custoISSQN=issqnPago;        // retido pela prefeitura (custo operação)
+  // INSS empregado = desconto/repasse, não é custo adicional
+
+  const totalSaiu=custoSalarios+custoFGTS+custoISSQN+totalVT+totalVA;
+  const sobra=fat-totalSaiu;
+
+  // Reserva mensal obrigatória
+  const reservaMensal=totalProv; // 13º + férias + 1/3 = ~19,44% do bruto
+
+  // Custo total rescisão hoje (todos os funcionários)
+  let totalResc=0;
+  ativos.forEach(r=>{
+    const resc=calcRescTipo(r,meses,tipo);
+    totalResc+=resc.total;
+  });
+
+  const reservaAcum=totalProv*meses; // provisões acumuladas até agora
+  const saldoLivre=sobra-reservaMensal;
+
+  // ── ALERTAS ──
+  const alertas=[];
+  if(saldoLivre<0) alertas.push({tipo:'danger',icon:'🚨',titulo:'Saldo livre negativo!',msg:`A empresa está usando R$ ${brl(Math.abs(saldoLivre))} que deveria estar provisionado. Reveja os custos ou o faturamento.`});
+  if(reservaAcum<totalResc) alertas.push({tipo:'warn',icon:'⚠️',titulo:'Reserva abaixo do custo de rescisão',msg:`A reserva acumulada (${brl(reservaAcum)}) é menor que o custo total de demitir a equipe (${brl(totalResc)}). Diferença: ${brl(totalResc-reservaAcum)}.`});
+  if(sobra<reservaMensal) alertas.push({tipo:'warn',icon:'⚠️',titulo:'Sobra insuficiente para provisões',msg:`A sobra mensal (${brl(sobra)}) é menor que a reserva mensal necessária (${brl(reservaMensal)}).`});
+  if(alertas.length===0) alertas.push({tipo:'ok',icon:'✅',titulo:'Situação financeira saudável',msg:`Saldo livre de ${brl(saldoLivre)} disponível após reservas obrigatórias.`});
+
+  document.getElementById('fundo-alertas').innerHTML=alertas.map(a=>`
+    <div style="background:${a.tipo==='danger'?'#fdf2f2':a.tipo==='warn'?'#fef9ec':'#eefaf3'};border:1px solid ${a.tipo==='danger'?'#f5c6c6':a.tipo==='warn'?'#f5e0a0':'#a8dfc5'};border-radius:10px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
+      <span style="font-size:1.3rem">${a.icon}</span>
+      <div><div style="font-size:.82rem;font-weight:700">${a.titulo}</div><div style="font-size:.74rem;color:var(--mu)">${a.msg}</div></div>
+    </div>`).join('');
+
+  // ── FLUXO DO MÊS ──
+  document.getElementById('fundo-fluxo').innerHTML=`
+    ${bkFluxo('🏦 Fatura Recebida',brl(fat),'var(--v)',true)}
+    ${bkFluxo('➖ Salários Brutos',brl(custoSalarios),'var(--dg)')}
+    ${bkFluxo('➖ FGTS Patronal (8%)',brl(custoFGTS),'var(--wn)')}
+    ${bkFluxo('➖ ISSQN (2% NF)',brl(custoISSQN),'#8e44ad')}
+    ${bkFluxo('➖ Vale Transporte',brl(totalVT),'var(--mu)')}
+    ${bkFluxo('➖ Vale Alimentação',brl(totalVA),'var(--mu)')}
+    <div style="background:${sobra>=0?'var(--vm)':'#fdf2f2'};border:1.5px solid ${sobra>=0?'var(--v)':'var(--dg)'};border-radius:9px;padding:12px 14px;display:flex;justify-content:space-between;margin-top:6px">
+      <span style="font-weight:700;font-size:.82rem">= Sobra após custos diretos</span>
+      <span style="font-weight:700;font-family:'DM Mono',monospace;font-size:.95rem;color:${sobra>=0?'var(--vd)':'var(--dg)'}">${brl(sobra)}</span>
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--bd);border-radius:7px;padding:8px 12px;margin-top:6px;font-size:.72rem;color:var(--mu)">
+      ℹ️ INSS do empregado (${brl(inssPago)}) é desconto/repasse — não entra como custo adicional da empresa.
+    </div>`;
+
+  // ── RESERVA ──
+  document.getElementById('fundo-reserva').innerHTML=`
+    ${bkFluxo('📅 Provisão 13º (8,33%/mês)',brl(ativos.reduce((a,r)=>a+calc(r).d13,0)),'var(--v)')}
+    ${bkFluxo('🏖️ Provisão Férias (8,33%/mês)',brl(ativos.reduce((a,r)=>a+calc(r).fer,0)),'var(--v)')}
+    ${bkFluxo('➕ Provisão 1/3 Férias (2,78%/mês)',brl(ativos.reduce((a,r)=>a+calc(r).ter,0)),'var(--v)')}
+    <div style="background:var(--vm);border:1.5px solid var(--v);border-radius:9px;padding:12px 14px;display:flex;justify-content:space-between;margin-top:6px">
+      <span style="font-weight:700;font-size:.82rem">= Reserva Mensal Obrigatória</span>
+      <span style="font-weight:700;font-family:'DM Mono',monospace;font-size:.95rem;color:var(--vd)">${brl(reservaMensal)}</span>
+    </div>
+    <div style="background:${saldoLivre>=0?'#eefaf3':'#fdf2f2'};border:1.5px solid ${saldoLivre>=0?'var(--vl)':'var(--dg)'};border-radius:9px;padding:12px 14px;display:flex;justify-content:space-between;margin-top:8px">
+      <span style="font-weight:800;font-size:.86rem">💰 SALDO LIVRE REAL</span>
+      <span style="font-weight:800;font-family:'DM Mono',monospace;font-size:1.05rem;color:${saldoLivre>=0?'var(--vd)':'var(--dg)'}">${brl(saldoLivre)}</span>
+    </div>`;
+
+  // ── CARDS ──
+  document.getElementById('fundo-cards').innerHTML=`
+    <div class="sc"><div class="si">🏦</div><div class="sl">Reserva Mensal</div><div class="sv">${brl(reservaMensal)}</div><div class="ss">a guardar todo mês</div></div>
+    <div class="sc red"><div class="si">⚖️</div><div class="sl">Rescisão Total (${meses}m)</div><div class="sv">${brl(totalResc)}</div><div class="ss">${tipo==='sjc'?'sem justa causa':tipo==='tc'?'término contrato':'pedido demissão'}</div></div>
+    <div class="sc orange"><div class="si">📦</div><div class="sl">Prov. Acumulada (${meses}m)</div><div class="sv">${brl(reservaAcum)}</div><div class="ss">13º + férias + 1/3</div></div>
+    <div class="sc ${saldoLivre>=0?'':'red'}"><div class="si">${saldoLivre>=0?'✅':'🚨'}</div><div class="sl">Saldo Livre Real</div><div class="sv">${brl(saldoLivre)}</div><div class="ss">após reservas obrigatórias</div></div>`;
+
+  // ── TABELA FUNCIONÁRIOS ──
+  renderFundoTabela(ativos,meses,tipo);
+  renderSimMeses();
+}
+
+function calcRescTipo(r,meses,tipo){
+  const c=calc(r);
+  const bruto=c.bruto;
+  const saldo13=bruto*(meses%12)/12;
+  const saldoFer=bruto*(meses%12)/12;
+  const tercoFer=saldoFer/3;
+  const fgtsSaldo=bruto*FGTS_PERC*meses;
+  let avisoPrevio=0, multaFGTS=0;
+  if(tipo==='sjc'){ avisoPrevio=bruto; multaFGTS=fgtsSaldo*0.40; }
+  if(tipo==='tc'){ avisoPrevio=0; multaFGTS=0; }
+  if(tipo==='pd'){ avisoPrevio=0; multaFGTS=0; }
+  const total=saldo13+saldoFer+tercoFer+avisoPrevio+multaFGTS;
+  return{saldo13,saldoFer,tercoFer,avisoPrevio,fgtsSaldo,multaFGTS,total};
+}
+
+function renderFundoTabela(ativos,meses,tipo){
+  if(!ativos.length){document.getElementById('fundo-tbl').innerHTML='<div class="es"><div class="ei">👥</div><p>Sem dados</p></div>';return;}
+  let tBruto=0,tFgts=0,tProv=0,tProvAcum=0,tResc=0,tReserva=0;
+  const rows=ativos.map(r=>{
+    const c=calc(r);
+    const adm=r.data_admissao?new Date(r.data_admissao):new Date('2026-02-02');
+    const mesesReais=Math.max(1,Math.round((new Date()-adm)/2592000000));
+    const provMes=c.d13+c.fer+c.ter;
+    const provAcum=provMes*mesesReais;
+    const resc=calcRescTipo(r,mesesReais,tipo);
+    const reservaInd=provMes+resc.multaFGTS/meses; // reserva mensal individual recomendada
+    tBruto+=c.bruto;tFgts+=c.fgts;tProv+=provMes;tProvAcum+=provAcum;tResc+=resc.total;tReserva+=reservaInd;
+    return`<tr>
+      <td><strong>${r.nome||'–'}</strong></td>
+      <td style="font-size:.7rem">${r.cargo||'–'}</td>
+      <td class="mono">${brl(c.sal)}</td>
+      <td class="mono">${brl(c.ins)}</td>
+      <td class="mono"><strong>${brl(c.bruto)}</strong></td>
+      <td class="mono">${fmtD(r.data_admissao)}</td>
+      <td class="mono">${mesesReais}m</td>
+      <td class="mono" style="color:var(--v)">${brl(provMes)}</td>
+      <td class="mono" style="color:var(--v)">${brl(provAcum)}</td>
+      <td class="mono" style="color:var(--dg)">${brl(resc.total)}</td>
+      <td><span class="tag">${brl(reservaInd)}</span></td>
+    </tr>`;
+  });
+  document.getElementById('fundo-tbl').innerHTML=`<table><thead><tr>
+    <th>Nome</th><th>Cargo</th><th>Salário</th><th>Insalub.</th><th>Bruto</th><th>Admissão</th><th>Tempo</th><th>Prov./mês</th><th>Prov.Acum.</th><th>Custo Rescisão</th><th>Reserva/mês</th>
+  </tr></thead><tbody>${rows.join('')}
+    <tr style="background:var(--vm);font-weight:700"><td colspan="4">TOTAIS</td>
+    <td class="mono">${brl(tBruto)}</td><td colspan="2"></td>
+    <td class="mono">${brl(tProv)}</td><td class="mono">${brl(tProvAcum)}</td>
+    <td class="mono">${brl(tResc)}</td><td class="mono">${brl(tReserva)}</td></tr>
+  </tbody></table>`;
+}
+
+function renderSimMeses(){
+  const ate=parseInt(document.getElementById('sim-ate')?.value)||6;
+  const tipo=document.getElementById('fr-tipo')?.value||'sjc';
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  if(!ativos.length){document.getElementById('sim-meses-tbl').innerHTML='<div class="es"><div class="ei">📊</div><p>Sem dados</p></div>';return;}
+
+  const cols=['Mês','Func.','Prov.13º','Prov.Férias','Prov.1/3','Aviso Prévio','FGTS Acum.','Multa FGTS','Total Rescisão','Prov.Acumulada','RESERVA TOTAL'];
+  const rows=[];
+  for(let m=1;m<=ate;m++){
+    let t13=0,tfer=0,tter=0,tav=0,tfgt=0,tmul=0,tresc=0,tprov=0;
+    ativos.forEach(r=>{
+      const resc=calcRescTipo(r,m,tipo);
+      const c=calc(r);
+      t13+=resc.saldo13;tfer+=resc.saldoFer;tter+=resc.tercoFer;
+      tav+=resc.avisoPrevio;tfgt+=resc.fgtsSaldo;tmul+=resc.multaFGTS;tresc+=resc.total;
+      tprov+=(c.d13+c.fer+c.ter)*m;
+    });
+    const totalRes=tresc+tprov;
+    rows.push(`<tr ${m===parseInt(document.getElementById('fr-meses')?.value)?'style="background:#fff9ec;font-weight:600"':''}>
+      <td><strong>${m}º mês</strong></td><td>${ativos.length}</td>
+      <td class="mono">${brl(t13)}</td><td class="mono">${brl(tfer)}</td><td class="mono">${brl(tter)}</td>
+      <td class="mono">${brl(tav)}</td><td class="mono">${brl(tfgt)}</td>
+      <td class="mono" style="color:var(--dg)">${brl(tmul)}</td>
+      <td class="mono"><strong>${brl(tresc)}</strong></td>
+      <td class="mono" style="color:var(--v)">${brl(tprov)}</td>
+      <td><span class="tag" style="background:#fff3cd;color:#856404">${brl(totalRes)}</span></td>
+    </tr>`);
+  }
+  document.getElementById('sim-meses-tbl').innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+function bkFluxo(label,valor,cor='var(--tx)',destaque=false){
+  return`<div style="background:var(--bg);border-radius:7px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;${destaque?'border:1.5px solid '+cor+';background:var(--vm)':''}">
+    <span style="font-size:.74rem;color:${destaque?cor:'var(--mu)'};font-weight:${destaque?'700':'400'}">${label}</span>
+    <span style="font-size:.8rem;font-weight:700;font-family:'DM Mono',monospace;color:${cor}">${valor}</span>
+  </div>`;
+}
+
+function exportFundo(){
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  const meses=parseInt(document.getElementById('fr-meses')?.value)||3;
+  const tipo=document.getElementById('fr-tipo')?.value||'sjc';
+  const h='Nome,Cargo,Salário,Insalubridade,Bruto,Admissão,Meses,Prov.Mensal,Prov.Acumulada,Custo Rescisão';
+  const rows=ativos.map(r=>{
+    const c=calc(r);
+    const adm=r.data_admissao?new Date(r.data_admissao):new Date('2026-02-02');
+    const m=Math.max(1,Math.round((new Date()-adm)/2592000000));
+    const prov=c.d13+c.fer+c.ter;
+    const resc=calcRescTipo(r,m,tipo);
+    return`${r.nome},${r.cargo},${c.sal},${c.ins},${c.bruto.toFixed(2)},${r.data_admissao||''},${m},${prov.toFixed(2)},${(prov*m).toFixed(2)},${resc.total.toFixed(2)}`;
+  });
+  const blob=new Blob([[h,...rows].join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fundo_reserva_vitagest.csv';a.click();
+  toast('CSV exportado!');
+}
+
+// FUNCIONÁRIOS
+async function loadFunc(){
+  document.getElementById('tbl-f').innerHTML='<div class="loading"><div class="sp"></div></div>';
+  allFunc=await qry('financeiro',true,'nome');allCargos=await qry('cargos_padrao',true,'nome');
+  preencherFiltCargos();renderFunc(allFunc);
+  const sel=document.getElementById('r-func');
+  sel.innerHTML='<option value="">Selecione...</option>'+allFunc.filter(r=>r.status!=='Inativo').map(r=>`<option value="${r.id}">${r.nome}</option>`).join('');
+}
+
+function renderFunc(data){
+  const el=document.getElementById('tbl-f');
+  document.getElementById('fc-count').textContent=data.length+' registros';
+  if(!data.length){el.innerHTML='<div class="es"><div class="ei">👥</div><p>Nenhum</p></div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Nome</th><th>Cargo</th><th>Admissão</th><th>Salário</th><th>FGTS/mês</th><th>Custo Real/mês</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(r=>{const c=calc(r);return`<tr>
+      <td><strong>${r.nome||'–'}</strong></td><td>${r.cargo||'–'}</td>
+      <td class="mono">${fmtD(r.data_admissao)}</td>
+      <td class="mono">${brl(c.sal)}</td>
+      <td class="mono">${brl(c.fgts)}</td>
+      <td><span class="tag" style="cursor:pointer" onclick="verFunc(${r.id})" title="Clique para ver composição">${brl(c.custoMensal)} 👁</span></td>
+      <td>${badge(r.status||'Ativo')}</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn bo bxs" onclick="verFunc(${r.id})">👁</button>
+        <button class="btn bo bxs" onclick="editFunc(${r.id})">✏️</button>
+        <button class="btn bd2 bxs" onclick="desligar(${r.id},'${r.status||'Ativo'}')">🔴</button>
+      </td>
+    </tr>`;}).join('')}
+  </tbody></table>`;
+}
+
+function filtFunc(){
+  const q=(document.getElementById('sf')?.value||'').toLowerCase();
+  const c=document.getElementById('ffc')?.value||'';
+  const s=document.getElementById('ffs')?.value||'';
+  let d=allFunc;
+  if(q)d=d.filter(r=>JSON.stringify(r).toLowerCase().includes(q));
+  if(c)d=d.filter(r=>r.cargo===c);
+  if(s)d=d.filter(r=>r.status===s);
+  renderFunc(d);
+}
+
+function preencherFiltCargos(){
+  const cargos=[...new Set(allFunc.map(r=>r.cargo).filter(Boolean))];
+  const el=document.getElementById('ffc');const v=el.value;
+  el.innerHTML='<option value="">Todos os cargos</option>'+cargos.map(c=>`<option>${c}</option>`).join('');el.value=v;
+}
+
+async function verFunc(id){
+  const{data:r}=await sb.from('financeiro').select('*').eq('id',id).single();if(!r)return;
+  const c=calc(r);
+  const adm=r.data_admissao?new Date(r.data_admissao):new Date('2026-02-02');
+  const meses=Math.max(1,Math.round((new Date()-adm)/2592000000));
+  const resc=calcResc(r,meses);
+
+  document.getElementById('mT').textContent='👤 '+r.nome;
+  document.getElementById('mB').innerHTML=`
+    <div class="fg" style="margin-bottom:14px">
+      ${fi('Cargo',r.cargo)}${fi('Setor',r.setor)}${fi('Admissão',fmtD(r.data_admissao))}${fi('Status',badge(r.status||'Ativo'))}
+    </div>
+    <div class="dv"></div>
+    <div style="font-size:.68rem;font-weight:800;color:var(--v);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">💰 Composição do Custo Mensal</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+      ${bk('Salário Base',brl(c.sal))}${bk('Insalubridade (20%)',brl(c.ins))}
+      ${bk('FGTS Patronal (8%)',brl(c.fgts))}${bk('Vale Transporte',brl(c.vt))}
+      ${bk('Vale Alimentação',brl(c.va))}${bk('Provisão 13º (8,33%)',brl(c.d13))}
+      ${bk('Provisão Férias (8,33%)',brl(c.fer))}${bk('Provisão 1/3 (2,78%)',brl(c.ter))}
+    </div>
+    <div class="bk-total"><span style="font-weight:700">💰 Custo Mensal Real</span><span style="font-size:1.1rem;font-weight:700;font-family:'DM Mono',monospace">${brl(c.custoMensal)}</span></div>
+    <div class="dv"></div>
+    <div style="font-size:.68rem;font-weight:800;color:var(--dg);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚖️ Rescisão Estimada (${meses} meses)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+      ${bk('Saldo 13º Proporcional',brl(resc.saldo13))}${bk('Férias Proporcionais',brl(resc.saldoFer))}
+      ${bk('1/3 Férias',brl(resc.tercoFer))}${bk('Aviso Prévio',brl(resc.avisoPrevio))}
+      ${bk('FGTS Acumulado',brl(resc.fgtsSaldo))}${bk('Multa FGTS (40%)',brl(resc.multaFGTS))}
+    </div>
+    <div class="bk-total" style="background:var(--dg)"><span style="font-weight:700;color:#fff">⚖️ Custo Total Rescisão</span><span style="font-size:1.1rem;font-weight:700;font-family:'DM Mono',monospace;color:#fff">${brl(resc.total)}</span></div>
+    <div class="fa"><button class="btn bo" onclick="closeModal()">Fechar</button><button class="btn bp" onclick="closeModal();editFunc(${r.id})">✏️ Editar</button></div>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function abrirNovoFunc(){
+  if(!allCargos.length)qry('cargos_padrao',true,'nome').then(d=>{allCargos=d;});
+  document.getElementById('mT').textContent='+ Novo Funcionário';
+  document.getElementById('mB').innerHTML=formFunc();
+  document.getElementById('modal').classList.add('open');
+}
+
+function formFunc(r){
+  const co=allCargos.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
+  return`<div style="margin-bottom:12px;padding:10px;background:var(--vm);border-radius:7px;font-size:.76rem;color:var(--vd)">💡 Selecione cargo padrão para preenchimento automático.</div>
+  <div style="margin-bottom:12px"><label style="font-size:.66rem;font-weight:700;color:var(--mu);text-transform:uppercase;display:block;margin-bottom:3px">Cargo Padrão</label>
+  <select id="f-cp" onchange="aplicarCP()" style="width:100%;padding:7px 11px;border-radius:6px;border:1.5px solid var(--bd);font-family:inherit;font-size:.81rem"><option value="">Selecionar...</option>${co}</select></div>
+  <div class="fg">
+    <div class="fsec">Dados Pessoais</div>
+    <div class="fgrp full"><label>Nome Completo *</label><input id="f-nome" value="${r?.nome||''}" placeholder="Nome completo"></div>
+    <div class="fgrp"><label>Cargo *</label><input id="f-cargo" value="${r?.cargo||''}" placeholder="Ex: Técnico de Enfermagem"></div>
+    <div class="fgrp"><label>Setor</label><input id="f-setor" value="${r?.setor||''}" placeholder="Ex: Enfermagem"></div>
+    <div class="fgrp"><label>Data de Admissão</label><input id="f-data_admissao" type="date" value="${r?.data_admissao||''}"></div>
+    <div class="fgrp"><label>Carga Horária</label><input id="f-carga_horaria" value="${r?.carga_horaria||''}" placeholder="200h/mês"></div>
+    <div class="fsec">Remuneração</div>
+    <div class="fgrp"><label>Salário Base (R$) *</label><input id="f-salario_base" type="number" step="0.01" value="${r?.salario_base||''}"></div>
+    <div class="fgrp"><label>Insalubridade (R$)</label><input id="f-insalubridade" type="number" step="0.01" value="${r?.insalubridade||0}"></div>
+    <div class="fgrp"><label>Vale Alimentação (R$)</label><input id="f-vale_alimentacao" type="number" step="0.01" value="${r?.vale_alimentacao||0}"></div>
+    <div class="fgrp"><label>Vale Transporte (R$)</label><input id="f-vale_transporte" type="number" step="0.01" value="${r?.vale_transporte||0}"></div>
+    <div class="fsec">Situação Contratual</div>
+    <div class="fgrp"><label>Status</label><select id="f-status"><option ${(!r||r.status==='Ativo')?'selected':''}>Ativo</option><option ${r?.status==='Experiência'?'selected':''}>Experiência</option><option ${r?.status==='Inativo'?'selected':''}>Inativo</option></select></div>
+    <div class="fgrp"><label>Contrato Experiência?</label><select id="f-contrato_experiencia"><option value="false" ${!r?.contrato_experiencia?'selected':''}>Não</option><option value="true" ${r?.contrato_experiencia?'selected':''}>Sim</option></select></div>
+    <div class="fgrp"><label>Previsão de Rescisão</label><input id="f-previsao_rescisao" type="date" value="${r?.previsao_rescisao||''}"></div>
+    <div class="fgrp"><label>Ref. Contrato/Prefeitura</label><input id="f-custo_contrato" value="${r?.custo_contrato||''}" placeholder="Contrato 001/2025"></div>
+  </div>
+  <div class="fa"><button class="btn bo" onclick="closeModal()">Cancelar</button><button class="btn bp" onclick="salvarFunc(${r?.id||'null'})">💾 Salvar</button></div>`;
+}
+
+function aplicarCP(){
+  const nome=document.getElementById('f-cp').value;
+  const c=allCargos.find(x=>x.nome===nome);if(!c)return;
+  document.getElementById('f-cargo').value=c.nome;
+  document.getElementById('f-setor').value=c.setor||'';
+  document.getElementById('f-salario_base').value=c.salario_base||0;
+  document.getElementById('f-insalubridade').value=c.insalubridade||0;
+  document.getElementById('f-vale_alimentacao').value=c.vale_alimentacao||0;
+  document.getElementById('f-vale_transporte').value=c.vale_transporte||0;
+}
+
+async function salvarFunc(id){
+  const nums=['salario_base','insalubridade','vale_alimentacao','vale_transporte'];
+  const campos=['nome','cargo','setor','data_admissao','carga_horaria','salario_base','insalubridade','vale_alimentacao','vale_transporte','status','contrato_experiencia','previsao_rescisao','custo_contrato'];
+  const obj={};
+  campos.forEach(f=>{const el=document.getElementById('f-'+f);if(!el)return;if(f==='contrato_experiencia')obj[f]=el.value==='true';else if(nums.includes(f))obj[f]=parseFloat(el.value)||0;else if(el.value)obj[f]=el.value;});
+  if(!obj.nome){toast('Nome obrigatório',true);return;}
+  let res;if(id&&id!=='null')res=await sb.from('financeiro').update(obj).eq('id',id);else res=await sb.from('financeiro').insert([obj]);
+  if(res.error){toast('Erro: '+res.error.message,true);return;}
+  toast('Funcionário salvo!');closeModal();loadFunc();loadDash();
+}
+
+async function editFunc(id){
+  if(!allCargos.length)allCargos=await qry('cargos_padrao',true,'nome');
+  const{data:r}=await sb.from('financeiro').select('*').eq('id',id).single();if(!r)return;
+  document.getElementById('mT').textContent='✏️ '+r.nome;
+  document.getElementById('mB').innerHTML=formFunc(r);
+  document.getElementById('modal').classList.add('open');
+}
+
+async function desligar(id,st){
+  if(st==='Inativo'){if(!confirm('Reativar?'))return;await sb.from('financeiro').update({status:'Ativo'}).eq('id',id);toast('Reativado!');loadFunc();return;}
+  document.getElementById('m2T').textContent='🔴 Desligamento';
+  document.getElementById('m2B').innerHTML=`<p style="margin-bottom:14px;font-size:.83rem;color:var(--mu)">O funcionário será marcado como Inativo e removido dos cálculos ativos.</p>
+    <div class="fgrp" style="margin-bottom:12px"><label>Motivo</label><select id="motivo"><option>Pedido de demissão</option><option>Demissão sem justa causa</option><option>Término de contrato</option><option>Acordo mútuo</option></select></div>
+    <div class="fa"><button class="btn bo" onclick="document.getElementById('modal2').classList.remove('open')">Cancelar</button><button class="btn bd2" onclick="confirmDeslig(${id})">🔴 Confirmar</button></div>`;
+  document.getElementById('modal2').classList.add('open');
+}
+
+async function confirmDeslig(id){
+  const m=document.getElementById('motivo')?.value||'';
+  await sb.from('financeiro').update({status:'Inativo',custo_contrato:'DESLIGADO: '+m}).eq('id',id);
+  document.getElementById('modal2').classList.remove('open');
+  toast('Desligado.');loadFunc();loadDash();
+}
+
+// CARGOS
+async function loadCargos(){
+  document.getElementById('l-cargos').innerHTML='<div class="loading"><div class="sp"></div></div>';
+  allCargos=await qry('cargos_padrao',true,'nome');
+  if(!allCargos.length){document.getElementById('l-cargos').innerHTML='<div class="es"><div class="ei">🏷️</div><p>Nenhum cargo</p></div>';return;}
+  document.getElementById('l-cargos').innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">${allCargos.map(c=>{
+    const bruto=(+c.salario_base||0)+(+c.insalubridade||0);
+    const fgts=bruto*FGTS_PERC;
+    const prov=bruto*(D13+FER+TER);
+    const total=bruto+fgts+(+c.vale_alimentacao||0)+(+c.vale_transporte||0)+prov;
+    return`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;box-shadow:var(--sh)">
+      <div style="font-size:.82rem;font-weight:700;margin-bottom:10px">${c.nome}</div>
+      <div style="font-size:.7rem;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px"><span>Setor</span><span>${c.setor||'–'}</span></div>
+      <div style="font-size:.7rem;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px"><span>Salário Base</span><span class="mono">${brl(c.salario_base)}</span></div>
+      <div style="font-size:.7rem;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px"><span>Insalubridade</span><span class="mono">${brl(c.insalubridade)}</span></div>
+      <div style="font-size:.7rem;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px"><span>FGTS (8%)</span><span class="mono">${brl(fgts)}</span></div>
+      <div style="font-size:.7rem;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:3px"><span>Provisões (19,44%)</span><span class="mono">${brl(prov)}</span></div>
+      <div style="background:var(--vm);border-radius:6px;padding:8px 10px;display:flex;justify-content:space-between;margin-top:8px">
+        <span style="font-size:.72rem;font-weight:700;color:var(--vd)">Custo Real/mês</span>
+        <span style="font-size:.88rem;font-weight:700;color:var(--vd);font-family:'DM Mono',monospace">${brl(total)}</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn bo bxs" onclick="editCargo(${c.id})" style="flex:1">✏️ Editar</button>
+        <button class="btn bd2 bxs" onclick="delCargo(${c.id})">🗑</button>
+      </div>
+    </div>`;}).join('')}</div>`;
+}
+
+function abrirNovoCargo(){document.getElementById('mT').textContent='+ Novo Cargo';document.getElementById('mB').innerHTML=formCargo();document.getElementById('modal').classList.add('open');}
+function formCargo(c){return`<div class="fg">
+  <div class="fgrp full"><label>Nome *</label><input id="c-nome" value="${c?.nome||''}" placeholder="Ex: Técnico de Enfermagem"></div>
+  <div class="fgrp"><label>Setor</label><input id="c-setor" value="${c?.setor||''}" placeholder="Enfermagem"></div>
+  <div class="fgrp"><label>Salário Base (R$) *</label><input id="c-sal" type="number" step="0.01" value="${c?.salario_base||''}"></div>
+  <div class="fgrp"><label>Insalubridade (R$)</label><input id="c-ins" type="number" step="0.01" value="${c?.insalubridade||0}"></div>
+  <div class="fgrp"><label>Vale Alimentação</label><input id="c-va" type="number" step="0.01" value="${c?.vale_alimentacao||0}"></div>
+  <div class="fgrp"><label>Vale Transporte</label><input id="c-vt" type="number" step="0.01" value="${c?.vale_transporte||0}"></div>
+</div><div class="fa"><button class="btn bo" onclick="closeModal()">Cancelar</button><button class="btn bp" onclick="salvarCargo(${c?.id||'null'})">💾 Salvar</button></div>`;}
+
+async function salvarCargo(id){
+  const obj={nome:document.getElementById('c-nome')?.value,setor:document.getElementById('c-setor')?.value,salario_base:parseFloat(document.getElementById('c-sal')?.value)||0,insalubridade:parseFloat(document.getElementById('c-ins')?.value)||0,vale_alimentacao:parseFloat(document.getElementById('c-va')?.value)||0,vale_transporte:parseFloat(document.getElementById('c-vt')?.value)||0};
+  if(!obj.nome){toast('Nome obrigatório',true);return;}
+  let res;if(id&&id!=='null')res=await sb.from('cargos_padrao').update(obj).eq('id',id);else res=await sb.from('cargos_padrao').insert([obj]);
+  if(res.error){toast('Erro: '+res.error.message,true);return;}
+  toast('Cargo salvo!');closeModal();loadCargos();
+}
+async function editCargo(id){const{data:c}=await sb.from('cargos_padrao').select('*').eq('id',id).single();document.getElementById('mT').textContent='✏️ Editar Cargo';document.getElementById('mB').innerHTML=formCargo(c);document.getElementById('modal').classList.add('open');}
+async function delCargo(id){if(!confirm('Excluir?'))return;await sb.from('cargos_padrao').delete().eq('id',id);toast('Excluído!');loadCargos();}
+
+// FOLHA DETALHADA
+async function loadFolha(){
+  if(!allFunc.length)allFunc=await qry('financeiro',true,'nome');
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  if(!ativos.length){document.getElementById('tbl-folha').innerHTML='<div class="es"><div class="ei">💰</div><p>Sem dados</p></div>';return;}
+  let tS=0,tI=0,tFg=0,tVT=0,tVA=0,tD13=0,tFer=0,tTer=0,tTot=0;
+  const rows=ativos.map(r=>{const c=calc(r);tS+=c.sal;tI+=c.ins;tFg+=c.fgts;tVT+=c.vt;tVA+=c.va;tD13+=c.d13;tFer+=c.fer;tTer+=c.ter;tTot+=c.custoMensal;
+    return`<tr><td><strong>${r.nome||'–'}</strong></td><td>${r.cargo||'–'}</td>
+      <td class="mono">${brl(c.sal)}</td><td class="mono">${brl(c.ins)}</td>
+      <td class="mono" style="color:var(--wn)">${brl(c.fgts)}</td>
+      <td class="mono">${brl(c.vt)}</td><td class="mono">${brl(c.va)}</td>
+      <td class="mono" style="color:var(--v)">${brl(c.d13)}</td>
+      <td class="mono" style="color:var(--v)">${brl(c.fer)}</td>
+      <td class="mono" style="color:var(--v)">${brl(c.ter)}</td>
+      <td><span class="tag">${brl(c.custoMensal)}</span></td></tr>`;});
+  document.getElementById('tbl-folha').innerHTML=`<table><thead><tr>
+    <th>Nome</th><th>Cargo</th><th>Salário</th><th>Insalub.</th><th>FGTS 8%</th><th>V.Transp.</th><th>V.Alim.</th><th>Prov.13º</th><th>Prov.Férias</th><th>Prov.1/3</th><th>Total/Mês</th>
+  </tr></thead><tbody>${rows.join('')}
+    <tr style="background:var(--vm);font-weight:700"><td colspan="2">TOTAIS</td>
+    <td class="mono">${brl(tS)}</td><td class="mono">${brl(tI)}</td><td class="mono">${brl(tFg)}</td>
+    <td class="mono">${brl(tVT)}</td><td class="mono">${brl(tVA)}</td>
+    <td class="mono">${brl(tD13)}</td><td class="mono">${brl(tFer)}</td><td class="mono">${brl(tTer)}</td>
+    <td class="mono">${brl(tTot)}</td></tr>
+  </tbody></table>`;
+}
+
+function exportCSV(){
+  if(!allFunc.length){toast('Carregue a folha',true);return;}
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  const h='Nome,Cargo,Salário,Insalubridade,FGTS(8%),V.Transporte,V.Alimentação,Prov.13º,Prov.Férias,Prov.1/3,Custo Mensal,Custo Anual';
+  const rows=ativos.map(r=>{const c=calc(r);return`${r.nome},${r.cargo},${c.sal},${c.ins},${c.fgts.toFixed(2)},${c.vt},${c.va},${c.d13.toFixed(2)},${c.fer.toFixed(2)},${c.ter.toFixed(2)},${c.custoMensal.toFixed(2)},${c.custoAnual.toFixed(2)}`;});
+  const blob=new Blob([[h,...rows].join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`folha_vitagest_${new Date().toISOString().slice(0,7)}.csv`;a.click();
+  toast('CSV exportado!');
+}
+
+// ENCARGOS & IMPOSTOS
+async function loadEncargos(){
+  if(!allFunc.length)allFunc=await qry('financeiro',true,'nome');
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  let tBruto=0,tFGTS=0;
+  ativos.forEach(r=>{const c=calc(r);tBruto+=c.bruto;tFGTS+=c.fgts;});
+
+  const ult=HIST_REAL[HIST_REAL.length-1];
+  document.getElementById('enc-stats').innerHTML=`
+    <div class="sc orange"><div class="si">🏛️</div><div class="sl">FGTS Mensal (8%)</div><div class="sv">${brl(tFGTS)}</div><div class="ss">calculado sobre bruto</div></div>
+    <div class="sc blue"><div class="si">📋</div><div class="sl">INSS Empregado</div><div class="sv">${brl(ult.inss)}</div><div class="ss">descontado e repassado</div></div>
+    <div class="sc"><div class="si">🏙️</div><div class="sl">ISSQN (2% NF)</div><div class="sv">${brl(ult.issqn)}</div><div class="ss">retido pela prefeitura</div></div>
+    <div class="sc red"><div class="si">💰</div><div class="sl">Total Encargos/mês</div><div class="sv">${brl(tFGTS+ult.inss+ult.issqn)}</div></div>`;
+
+  document.getElementById('tbl-enc').innerHTML=`
+    <div style="margin-bottom:16px">
+      <div style="font-size:.76rem;font-weight:700;margin-bottom:10px;color:var(--vd)">Memória de Cálculo — FGTS (Simples Nacional)</div>
+      ${ativos.slice(0,5).map(r=>{const c=calc(r);return`
+      <div style="margin-bottom:8px;padding:10px 14px;background:var(--bg);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><strong style="font-size:.78rem">${r.nome}</strong><span class="tag">${brl(c.fgts)}</span></div>
+        <div style="font-size:.7rem;color:var(--mu)">Sal.${brl(c.sal)} + Insalub.${brl(c.ins)} = Bruto ${brl(c.bruto)} × 8% = <strong>${brl(c.fgts)}</strong></div>
+      </div>`;}).join('')}
+      ${ativos.length>5?`<div style="font-size:.72rem;color:var(--mu);text-align:center;padding:8px">+ ${ativos.length-5} funcionários não exibidos</div>`:''}
+    </div>`;
+
+  const hist=[...HIST_REAL];
+  document.getElementById('tbl-trib-hist').innerHTML=`<table><thead><tr>
+    <th>Competência</th><th>Funcionários</th><th>Folha Bruta</th><th>FGTS Pago</th><th>INSS Pago</th><th>ISSQN (NF)</th><th>Total Tributos</th><th>% sobre Folha</th>
+  </tr></thead><tbody>
+    ${hist.map(h=>{const tot=(h.fgts||0)+(h.inss||0)+(h.issqn||0);const perc=h.prov?((tot/h.prov)*100).toFixed(1):'–';
+      return`<tr><td><strong>${fmtMes(h.comp)}</strong></td><td>${h.nf}</td>
+      <td class="mono">${brl(h.prov)}</td><td class="mono" style="color:var(--wn)">${brl(h.fgts)}</td>
+      <td class="mono" style="color:#2980b9">${brl(h.inss)}</td><td class="mono" style="color:#8e44ad">${brl(h.issqn)}</td>
+      <td class="mono"><strong>${brl(tot)}</strong></td><td class="mono">${perc}%</td></tr>`;}).join('')}
+  </tbody></table>`;
+}
+
+// PROVISÕES
+async function loadProvisoes(){
+  if(!allFunc.length)allFunc=await qry('financeiro',true,'nome');
+  calcProvisoes();
+}
+
+function calcProvisoes(){
+  const meses=parseInt(document.getElementById('prov-meses')?.value)||3;
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  let td13=0,tfer=0,tter=0,tgeral=0;
+  ativos.forEach(r=>{const c=calc(r);td13+=c.d13;tfer+=c.fer;tter+=c.ter;tgeral+=c.d13+c.fer+c.ter;});
+
+  document.getElementById('prov-stats').innerHTML=`
+    <div class="sc"><div class="si">🎄</div><div class="sl">13º/mês</div><div class="sv">${brl(td13)}</div></div>
+    <div class="sc"><div class="si">🏖️</div><div class="sl">Férias/mês</div><div class="sv">${brl(tfer)}</div></div>
+    <div class="sc"><div class="si">➕</div><div class="sl">1/3 Férias/mês</div><div class="sv">${brl(tter)}</div></div>
+    <div class="sc red"><div class="si">📦</div><div class="sl">Acumulado ${meses} meses</div><div class="sv">${brl(tgeral*meses)}</div></div>`;
+
+  const rows=ativos.map(r=>{
+    const c=calc(r);const provMes=c.d13+c.fer+c.ter;const acum=provMes*meses;
+    return`<tr><td><strong>${r.nome||'–'}</strong></td><td>${r.cargo||'–'}</td>
+      <td class="mono">${brl(c.bruto)}</td>
+      <td class="mono">${brl(c.d13)}</td><td class="mono">${brl(c.fer)}</td><td class="mono">${brl(c.ter)}</td>
+      <td class="mono"><strong>${brl(provMes)}</strong></td>
+      <td class="mono"><span class="tag">${brl(acum)}</span></td></tr>`;});
+
+  document.getElementById('tbl-prov').innerHTML=`<table><thead><tr>
+    <th>Nome</th><th>Cargo</th><th>Sal.Bruto</th><th>13º/mês</th><th>Férias/mês</th><th>1/3/mês</th><th>Total/mês</th><th>Acum. ${meses} meses</th>
+  </tr></thead><tbody>${rows.join('')}
+    <tr style="background:var(--vm);font-weight:700"><td colspan="6">TOTAIS</td><td class="mono">${brl(tgeral)}</td><td class="mono">${brl(tgeral*meses)}</td></tr>
+  </tbody></table>`;
+}
+
+// SALDO DE RESERVA — MEMÓRIA DE CÁLCULO COMPLETA
+let resMesSel=3;
+
+async function loadReserva(){
+  if(!allFunc.length) allFunc=await qry('financeiro',true,'nome');
+
+  // Renderizar botões de meses 1-24
+  const btns=document.getElementById('res-mes-btns');
+  if(btns && !btns.innerHTML){
+    btns.innerHTML=Array.from({length:24},(_,i)=>i+1).map(m=>
+      `<button id="res-btn-${m}" onclick="selecionarMesRes(${m})" style="padding:5px 12px;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);background:#fff;color:var(--mu);transition:all .15s;font-family:inherit">${m}º mês</button>`
+    ).join('');
+  }
+  selecionarMesRes(resMesSel);
+}
+
+function selecionarMesRes(m){
+  resMesSel=m;
+  document.querySelectorAll('[id^="res-btn-"]').forEach(b=>{
+    b.style.background='#fff'; b.style.color='var(--mu)'; b.style.borderColor='var(--bd)';
+  });
+  const btn=document.getElementById('res-btn-'+m);
+  if(btn){btn.style.background='var(--vd)';btn.style.color='#fff';btn.style.borderColor='var(--vd)';}
+  renderReservaCompleta(m);
+}
+
+function renderReservaCompleta(meses){
+  const tipo=document.getElementById('res-tipo')?.value||'sjc';
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  if(!ativos.length){document.getElementById('tbl-reserva').innerHTML='<div class="es"><div class="ei">🏦</div><p>Sem funcionários ativos</p></div>';return;}
+
+  // Totais
+  let tFgtsMes=0,tFgtsAcum=0,tMulta=0,t13=0,tFer=0,tTer=0,tAviso=0,tTotal=0,tProvMes=0;
+
+  const rows=ativos.map(r=>{
+    const c=calc(r);
+    const fgtsMes=c.fgts;
+    const fgtsAcum=fgtsMes*meses;
+    const multa=tipo==='sjc'?fgtsAcum*0.40:0;
+    const prop13=c.bruto*(meses%12||12)/12;
+    const propFer=c.bruto*(meses%12||12)/12;
+    const terFer=propFer/3;
+    const aviso=tipo==='sjc'?c.bruto:0;
+    const totalResc=prop13+propFer+terFer+aviso+multa;
+    // Provisão mensal = 13º + férias + 1/3 + fração da multa
+    const provMes=c.d13+c.fer+c.ter+(multa/meses);
+
+    tFgtsMes+=fgtsMes;tFgtsAcum+=fgtsAcum;tMulta+=multa;
+    t13+=prop13;tFer+=propFer;tTer+=terFer;tAviso+=aviso;tTotal+=totalResc;tProvMes+=provMes;
+
+    return{r,c,fgtsMes,fgtsAcum,multa,prop13,propFer,terFer,aviso,totalResc,provMes};
+  });
+
+  // Banner
+  document.getElementById('res-total').textContent=brl(tTotal);
+  document.getElementById('res-mes-label').textContent=`${meses}º mês`;
+  document.getElementById('res-sub').textContent=`${tipo==='sjc'?'Sem justa causa (multa 40% FGTS)':tipo==='tc'?'Término de contrato':'Pedido de demissão'} — ${ativos.length} funcionários`;
+
+  // Cards linha 1
+  document.getElementById('res-stats').innerHTML=`
+    <div class="sc red"><div class="si">⚖️</div><div class="sl">Total Rescisão (${meses}º mês)</div><div class="sv" style="font-size:1.1rem">${brl(tTotal)}</div></div>
+    <div class="sc orange"><div class="si">🏛️</div><div class="sl">FGTS Acumulado</div><div class="sv" style="font-size:1.1rem">${brl(tFgtsAcum)}</div><div class="ss">8% × ${meses} meses</div></div>
+    <div class="sc red"><div class="si">💥</div><div class="sl">Multa 40% FGTS</div><div class="sv" style="font-size:1.1rem">${brl(tMulta)}</div><div class="ss">${tipo==='sjc'?'aplicável':'não aplicável'}</div></div>
+    <div class="sc"><div class="si">💰</div><div class="sl">Reserva Mensal Ideal</div><div class="sv" style="font-size:1.1rem">${brl(tProvMes)}</div><div class="ss">daqui para frente</div></div>`;
+
+  // Cards linha 2
+  document.getElementById('res-stats2').innerHTML=`
+    <div class="sc"><div class="si">🎄</div><div class="sl">13º Proporcional</div><div class="sv" style="font-size:1.1rem">${brl(t13)}</div><div class="ss">${meses%12||12}/12 avos</div></div>
+    <div class="sc"><div class="si">🏖️</div><div class="sl">Férias Proporcionais</div><div class="sv" style="font-size:1.1rem">${brl(tFer)}</div></div>
+    <div class="sc"><div class="si">➕</div><div class="sl">1/3 de Férias</div><div class="sv" style="font-size:1.1rem">${brl(tTer)}</div></div>
+    <div class="sc ${tipo==='sjc'?'orange':''}"><div class="si">📢</div><div class="sl">Aviso Prévio</div><div class="sv" style="font-size:1.1rem">${brl(tAviso)}</div><div class="ss">${tipo==='sjc'?'1 mês bruto':'não aplicável'}</div></div>`;
+
+  // Tabela detalhada
+  const tableRows=rows.map(({r,c,fgtsMes,fgtsAcum,multa,prop13,propFer,terFer,aviso,totalResc,provMes},i)=>`
+    <tr>
+      <td><strong>${r.nome||'–'}</strong></td>
+      <td style="font-size:.7rem">${r.cargo||'–'}</td>
+      <td class="mono">${brl(c.sal)}</td>
+      <td class="mono">${brl(c.ins)}</td>
+      <td class="mono"><strong>${brl(c.bruto)}</strong></td>
+      <td class="mono">${meses}m</td>
+      <td class="mono" style="color:var(--wn)">${brl(fgtsMes)}</td>
+      <td class="mono" style="color:var(--wn)">${brl(fgtsAcum)}</td>
+      <td class="mono" style="color:var(--dg)">${brl(multa)}</td>
+      <td class="mono">${brl(prop13)}</td>
+      <td class="mono">${brl(propFer)}</td>
+      <td class="mono">${brl(terFer)}</td>
+      <td class="mono">${brl(aviso)}</td>
+      <td class="mono"><strong style="color:var(--dg)">${brl(totalResc)}</strong></td>
+      <td class="mono" style="color:var(--v)">${brl(provMes)}</td>
+      <td>
+        <button class="btn bo bxs" onclick="verMemoria(${i},'${meses}','${tipo}')">👁 Ver memória</button>
+      </td>
+    </tr>`).join('');
+
+  document.getElementById('tbl-reserva').innerHTML=`
+    <table><thead><tr>
+      <th>Nome</th><th>Cargo</th><th>Salário</th><th>Insalub.</th><th>Bruto</th>
+      <th>Meses</th><th>FGTS/mês</th><th>FGTS Acum.</th><th>Multa 40%</th>
+      <th>13º Prop.</th><th>Férias Prop.</th><th>1/3 Férias</th><th>Aviso Prévio</th>
+      <th>Total Rescisão</th><th>Reserva/mês</th><th>Ação</th>
+    </tr></thead>
+    <tbody>${tableRows}
+      <tr style="background:var(--vm);font-weight:700">
+        <td colspan="6">TOTAIS</td>
+        <td class="mono">${brl(tFgtsMes)}</td>
+        <td class="mono">${brl(tFgtsAcum)}</td>
+        <td class="mono" style="color:var(--dg)">${brl(tMulta)}</td>
+        <td class="mono">${brl(t13)}</td>
+        <td class="mono">${brl(tFer)}</td>
+        <td class="mono">${brl(tTer)}</td>
+        <td class="mono">${brl(tAviso)}</td>
+        <td class="mono" style="color:var(--dg)"><strong>${brl(tTotal)}</strong></td>
+        <td class="mono" style="color:var(--v)">${brl(tProvMes)}</td>
+        <td></td>
+      </tr>
+    </tbody></table>`;
+
+  // Salvar rows para uso no modal
+  window._resRows=rows;
+}
+
+function verMemoria(idx,meses,tipo){
+  const d=window._resRows?.[idx];if(!d)return;
+  const {r,c,fgtsMes,fgtsAcum,multa,prop13,propFer,terFer,aviso,totalResc}=d;
+  const tipoLabel=tipo==='sjc'?'Sem Justa Causa':tipo==='tc'?'Término de Contrato':'Pedido de Demissão';
+  document.getElementById('mT').textContent='📋 Memória de Cálculo — '+r.nome;
+  document.getElementById('mB').innerHTML=`
+    <div style="background:var(--vm);border-radius:9px;padding:14px;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        ${fi('Nome',r.nome)}${fi('Cargo',r.cargo)}${fi('Admissão',fmtD(r.data_admissao))}
+      </div>
+    </div>
+    <div style="font-size:.68rem;font-weight:800;color:var(--v);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📐 Base de Cálculo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+      ${bkMem('Salário Base',brl(c.sal),'var(--tx)')}
+      ${bkMem('Insalubridade (20% SM)',brl(c.ins),'var(--tx)')}
+      ${bkMem('= Salário Bruto',brl(c.bruto),'var(--vd)',true)}
+      ${bkMem('Meses Simulados',meses+'º mês','var(--tx)')}
+      ${bkMem('Tipo de Demissão',tipoLabel,'var(--tx)')}
+      ${bkMem('Avos para 13º/Férias',(meses%12||12)+'/12','var(--tx)')}
+    </div>
+    <div style="font-size:.68rem;font-weight:800;color:var(--wn);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏛️ FGTS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+      ${bkMem('FGTS mensal = bruto × 8%',brl(fgtsMes),'var(--wn)')}
+      ${bkMem('FGTS acumulado = FGTS/mês × '+meses,brl(fgtsAcum),'var(--wn)')}
+      ${bkMem('Multa 40% = FGTS acum. × 40%',brl(multa),tipo==='sjc'?'var(--dg)':'var(--mu)')}
+      ${bkMem('Multa aplicável?',tipo==='sjc'?'Sim':'Não',tipo==='sjc'?'var(--dg)':'var(--mu)')}
+    </div>
+    <div style="font-size:.68rem;font-weight:800;color:var(--v);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📅 Verbas Rescisórias</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+      ${bkMem('13º prop. = bruto × '+((meses%12||12))+'/12',brl(prop13),'var(--v)')}
+      ${bkMem('Férias prop. = bruto × '+((meses%12||12))+'/12',brl(propFer),'var(--v)')}
+      ${bkMem('1/3 Férias = férias ÷ 3',brl(terFer),'var(--v)')}
+      ${bkMem('Aviso prévio (1 mês bruto)',brl(aviso),tipo==='sjc'?'var(--wn)':'var(--mu)')}
+    </div>
+    <div style="background:var(--dg);color:#fff;border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div>
+        <div style="font-size:.72rem;opacity:.8">13º + férias + 1/3 + aviso + multa FGTS</div>
+        <div style="font-weight:800;font-size:.88rem">= TOTAL ESTIMADO DE RESCISÃO</div>
+      </div>
+      <div style="font-size:1.3rem;font-weight:800;font-family:'DM Mono',monospace">${brl(totalResc)}</div>
+    </div>
+    <div style="font-size:.7rem;color:var(--mu);margin-top:8px;padding:10px;background:var(--bg);border-radius:7px">
+      ⚠️ O FGTS acumulado (${brl(fgtsAcum)}) já está depositado na conta do funcionário na CEF. A multa de 40% (${brl(multa)}) é paga pela empresa à CEF. As verbas rescisórias são pagas diretamente ao funcionário.
+    </div>
+    <div class="fa"><button class="btn bo" onclick="closeModal()">Fechar</button></div>`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function bkMem(label,valor,cor,destaque=false){
+  return`<div style="background:${destaque?'var(--vm)':'var(--bg)'};border:${destaque?'1.5px solid var(--v)':'1px solid var(--bd)'};border-radius:7px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:.72rem;color:var(--mu)">${label}</span>
+    <span style="font-size:.8rem;font-weight:700;font-family:'DM Mono',monospace;color:${cor}">${valor}</span>
+  </div>`;
+}
+
+function exportReservaCSV(){
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  const tipo=document.getElementById('res-tipo')?.value||'sjc';
+  const meses=resMesSel;
+  const h='Nome,Cargo,Salário,Insalubridade,Bruto,Meses,FGTS/mês,FGTS Acum.,Multa 40%,13º Prop.,Férias Prop.,1/3 Férias,Aviso Prévio,Total Rescisão';
+  const rows=ativos.map(r=>{
+    const c=calc(r);
+    const fgtsMes=c.fgts, fgtsAcum=fgtsMes*meses, multa=tipo==='sjc'?fgtsAcum*0.40:0;
+    const prop13=c.bruto*(meses%12||12)/12, propFer=prop13, terFer=propFer/3;
+    const aviso=tipo==='sjc'?c.bruto:0;
+    const total=prop13+propFer+terFer+aviso+multa;
+    return`${r.nome},${r.cargo},${c.sal},${c.ins},${c.bruto.toFixed(2)},${meses},${fgtsMes.toFixed(2)},${fgtsAcum.toFixed(2)},${multa.toFixed(2)},${prop13.toFixed(2)},${propFer.toFixed(2)},${terFer.toFixed(2)},${aviso.toFixed(2)},${total.toFixed(2)}`;
+  });
+  const blob=new Blob([[h,...rows].join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`reserva_mes${meses}_vitagest.csv`;a.click();
+  toast('CSV exportado!');
+}
+
+
+// SIMULADOR RESCISÃO
+async function loadRescisao(){
+  if(!allFunc.length) allFunc=await qry('financeiro',true,'nome');
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  // Preencher select
+  const sel=document.getElementById('r-func');
+  if(sel){
+    sel.innerHTML='<option value="">Selecione a funcionária...</option>'+
+      ativos.map(r=>`<option value="${r.id}">${r.nome} — ${r.cargo||''}</option>`).join('');
+  }
+  // Pré-calcular meses para o funcionário selecionado
+  const admInicio=new Date('2026-02-02');
+  const mesAtual=Math.max(1,Math.round((new Date()-admInicio)/2592000000));
+  const elMeses=document.getElementById('r-meses');
+  if(elMeses) elMeses.value=mesAtual;
+  renderRescAll();
+}
+
+function calcRescisao(){
+  const id=document.getElementById('r-func')?.value;
+  const meses=parseInt(document.getElementById('r-meses')?.value)||3;
+  const el=document.getElementById('resc-result');
+  if(!id||!el){el&&(el.innerHTML='');return;}
+  const r=allFunc.find(x=>String(x.id)===String(id));
+  if(!r){el.innerHTML='<div style="color:var(--mu);font-size:.82rem;padding:12px">Funcionária não encontrada.</div>';return;}
+  const c=calc(r);
+  const resc=calcResc(r,meses);
+  el.innerHTML=`<div class="resc-grid">
+    <div class="resc-card">
+      <div class="resc-title">📋 Verbas Rescisórias</div>
+      <div class="resc-item"><span class="resc-label">Saldo 13º Proporcional</span><span class="resc-value">${brl(resc.saldo13)}</span></div>
+      <div class="resc-item"><span class="resc-label">Férias Proporcionais</span><span class="resc-value">${brl(resc.saldoFer)}</span></div>
+      <div class="resc-item"><span class="resc-label">1/3 sobre Férias</span><span class="resc-value">${brl(resc.tercoFer)}</span></div>
+      <div class="resc-item"><span class="resc-label">Aviso Prévio (1 mês)</span><span class="resc-value">${brl(resc.avisoPrevio)}</span></div>
+      <div class="resc-item"><span class="resc-label">FGTS Acumulado (${meses}m)</span><span class="resc-value">${brl(resc.fgtsSaldo)}</span></div>
+      <div class="resc-item"><span class="resc-label">Multa FGTS (40%)</span><span class="resc-value" style="color:var(--dg)">${brl(resc.multaFGTS)}</span></div>
+      <div class="resc-total"><span>💰 Total Rescisão</span><span style="font-family:'DM Mono',monospace;font-size:1rem">${brl(resc.total)}</span></div>
+    </div>
+    <div class="resc-card" style="background:#fdf2f2;border-color:var(--dg)">
+      <div class="resc-title" style="color:var(--dg)">⚠️ Memória de Cálculo</div>
+      <div class="resc-item"><span class="resc-label">Salário Bruto</span><span class="resc-value">${brl(c.bruto)}</span></div>
+      <div class="resc-item"><span class="resc-label">Meses trabalhados</span><span class="resc-value">${meses}</span></div>
+      <div class="resc-item"><span class="resc-label">13º = bruto × (meses%12)/12</span><span class="resc-value">${brl(resc.saldo13)}</span></div>
+      <div class="resc-item"><span class="resc-label">FGTS = bruto × 8% × meses</span><span class="resc-value">${brl(resc.fgtsSaldo)}</span></div>
+      <div class="resc-item"><span class="resc-label">Multa = FGTS × 40%</span><span class="resc-value">${brl(resc.multaFGTS)}</span></div>
+      <div style="margin-top:10px;padding:10px;background:#fff;border-radius:7px;font-size:.72rem;color:var(--mu)">
+        ℹ️ Regime Simples Nacional — não há INSS patronal adicional na rescisão. O FGTS rescisório é recolhido à Caixa Econômica Federal.
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderRescAll(){
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  if(!ativos.length){document.getElementById('tbl-resc-all').innerHTML='<div class="es"><div class="ei">⚖️</div><p>Sem dados</p></div>';return;}
+  let tTotal=0;
+  const rows=ativos.map(r=>{
+    const adm=r.data_admissao?new Date(r.data_admissao):new Date('2026-02-02');
+    const meses=Math.max(1,Math.round((new Date()-adm)/2592000000));
+    const resc=calcResc(r,meses);tTotal+=resc.total;
+    return`<tr><td><strong>${r.nome||'–'}</strong></td><td>${r.cargo||'–'}</td>
+      <td class="mono">${meses}m</td><td class="mono">${brl(calc(r).bruto)}</td>
+      <td class="mono">${brl(resc.saldo13+resc.saldoFer+resc.tercoFer)}</td>
+      <td class="mono">${brl(resc.avisoPrevio)}</td>
+      <td class="mono" style="color:var(--dg)">${brl(resc.multaFGTS)}</td>
+      <td><span class="tag">${brl(resc.total)}</span></td></tr>`;});
+  document.getElementById('tbl-resc-all').innerHTML=`<table><thead><tr>
+    <th>Nome</th><th>Cargo</th><th>Tempo</th><th>Sal.Bruto</th><th>Férias+13º</th><th>Aviso</th><th>Multa FGTS</th><th>Total Rescisão</th>
+  </tr></thead><tbody>${rows.join('')}
+    <tr style="background:var(--vm);font-weight:700"><td colspan="7">TOTAL GERAL</td><td class="mono">${brl(tTotal)}</td></tr>
+  </tbody></table>`;
+}
+
+// HISTÓRICO
+async function loadHistorico(){
+  document.getElementById('hist-lista').innerHTML='<div class="loading"><div class="sp"></div></div>';
+  allHist=await qry('historico_folha',false,'competencia');
+  // Mesclar com dados reais
+  const hist=[...HIST_REAL];
+  allHist.forEach(h=>{if(!hist.find(x=>x.comp===h.competencia))hist.push({comp:h.competencia,prov:h.total_proventos,desc:h.total_descontos,liq:h.liquido_geral,fgts:h.fgts_pago||0,inss:h.inss_pago||0,issqn:h.issqn_pago||0,fat:h.fatura_prefeitura||0,nf:h.num_funcionarios||0,db_id:h.id});});
+  hist.sort((a,b)=>b.comp.localeCompare(a.comp));
+  const el=document.getElementById('hist-lista');
+  if(!hist.length){el.innerHTML='<div class="es"><div class="ei">📋</div><p>Nenhum histórico</p></div>';return;}
+  el.innerHTML=hist.map((h,i)=>{
+    const prev=hist[i+1];const tot=(h.fgts||0)+(h.inss||0)+(h.issqn||0);
+    const vp=prev?((h.prov-prev.prov)/prev.prov*100).toFixed(1):null;
+    return`<div class="hi">
+      <div class="hm">${fmtMes(h.comp)} ${h.comp>='2026-02'&&h.comp<='2026-04'?'<span class="tag">Importado</span>':''}</div>
+      <div class="hc">
+        <div><div class="hvl">Funcionários</div><div class="hv">${h.nf||'–'}</div></div>
+        <div><div class="hvl">Folha Bruta</div><div class="hv">${brl(h.prov)}</div></div>
+        <div><div class="hvl">Tributos</div><div class="hv" style="color:var(--wn)">${brl(tot)}</div></div>
+        <div><div class="hvl">Fatura Prefeitura</div><div class="hv">${brl(h.fat)}</div></div>
+        <div><div class="hvl">Líquido</div><div class="hv">${brl(h.liq)}</div></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${vp!==null?`<span class="${+vp>=0?'tu':'td'}">${+vp>=0?'▲':'▼'} ${Math.abs(vp)}%</span>`:'<span class="tag">Base</span>'}
+          ${h.db_id?`<button class="btn bd2 bxs" onclick="delHist(${h.db_id})">🗑</button>`:''}
+        </div>
+      </div>
+    </div>`;}).join('');
+  document.getElementById('imp-mes').value=new Date().toISOString().slice(0,7);
+}
+
+async function salvarHistorico(){
+  const mes=document.getElementById('imp-mes')?.value;
+  const prov=parseFloat(document.getElementById('imp-prov')?.value)||0;
+  const desc=parseFloat(document.getElementById('imp-desc')?.value)||0;
+  const fgts=parseFloat(document.getElementById('imp-fgts')?.value)||0;
+  const inss=parseFloat(document.getElementById('imp-inss')?.value)||0;
+  const issqn=parseFloat(document.getElementById('imp-issqn')?.value)||0;
+  const nf=parseInt(document.getElementById('imp-nf')?.value)||0;
+  const fat=parseFloat(document.getElementById('imp-fat')?.value)||0;
+  if(!mes||!prov){toast('Preencha competência e proventos',true);return;}
+  const{error}=await sb.from('historico_folha').insert([{competencia:mes,total_proventos:prov,total_descontos:desc,liquido_geral:prov-desc,fgts_pago:fgts,inss_pago:inss,issqn_pago:issqn,num_funcionarios:nf,fatura_prefeitura:fat}]);
+  if(error){toast('Erro: '+error.message,true);return;}
+  toast('Histórico salvo!');
+  ['imp-prov','imp-desc','imp-fgts','imp-inss','imp-issqn','imp-nf','imp-fat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  loadHistorico();loadDash();
+}
+
+async function delHist(id){if(!confirm('Excluir?'))return;await sb.from('historico_folha').delete().eq('id',id);toast('Removido!');loadHistorico();}
+
+// PROJEÇÃO
+async function loadProjecao(){
+  if(!allFunc.length)allFunc=await qry('financeiro',true,'nome');
+  gerarProj();
+}
+
+function gerarProj(){
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  if(!ativos.length){document.getElementById('tbl-proj').innerHTML='<div class="es"><div class="ei">📈</div><p>Cadastre funcionários</p></div>';return;}
+  const reaj=(parseFloat(document.getElementById('pr-reaj')?.value)||5)/100;
+  const cresc=parseInt(document.getElementById('pr-cresc')?.value)||0;
+  const infl=(parseFloat(document.getElementById('pr-infl')?.value)||4)/100;
+  const anoAtual=new Date().getFullYear();
+  const proj=[];
+  for(let a=0;a<5;a++){
+    const ano=anoAtual+a;const fr=Math.pow(1+reaj,a);const fb=Math.pow(1+infl,a);
+    let folha=0,fgts=0,prov=0,issqnEst=0;
+    ativos.forEach(r=>{
+      const sal=(+r.salario_base||0)*fr,ins=(+r.insalubridade||0)*fr,vt=(+r.vale_transporte||0)*fb,va=(+r.vale_alimentacao||0)*fb;
+      const bruto=sal+ins;const fg=bruto*FGTS_PERC;const pr=bruto*(D13+FER+TER);
+      folha+=bruto;fgts+=fg;prov+=pr;
+    });
+    const nFunc=ativos.length+(cresc*a);
+    if(cresc>0&&a>0){const ms=ativos.reduce((s,r)=>s+(+r.salario_base||0),0)/ativos.length*fr;folha+=ms*(1+FGTS_PERC+D13+FER+TER)*(cresc*a);fgts+=ms*FGTS_PERC*(cresc*a);}
+    const fatEst=(folha+fgts+prov)*Math.pow(1+infl,a)*1.35; // estimativa fatura
+    issqnEst=fatEst*0.02;
+    const custoAnual=(folha+fgts+prov+issqnEst)*12;
+    proj.push({ano,nFunc,folha,fgts,prov,issqnEst,custoAnual,custoMensal:custoAnual/12,fr});
+  }
+
+  if(chPr)chPr.destroy();
+  chPr=new Chart(document.getElementById('chProj'),{
+    type:'bar',
+    data:{labels:proj.map(p=>p.ano.toString()),datasets:[
+      {label:'Folha Bruta Anual',data:proj.map(p=>p.folha*12),backgroundColor:'rgba(26,122,74,0.8)',borderRadius:5},
+      {label:'FGTS Anual',data:proj.map(p=>p.fgts*12),backgroundColor:'rgba(230,126,34,0.8)',borderRadius:5},
+      {label:'Provisões Anuais',data:proj.map(p=>p.prov*12),backgroundColor:'rgba(142,68,173,0.8)',borderRadius:5},
+      {label:'Custo Mensal',data:proj.map(p=>p.custoMensal),type:'line',borderColor:'#c0392b',backgroundColor:'transparent',borderWidth:2,pointRadius:5,yAxisID:'y2'}
+    ]},
+    options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>'R$'+(v/1000).toFixed(0)+'k'}},y2:{position:'right',ticks:{callback:v=>'R$'+(v/1000).toFixed(1)+'k'},grid:{display:false}}},plugins:{legend:{labels:{font:{size:10}}}}}
+  });
+
+  const rows=proj.map((p,i)=>{const v=i>0?((p.custoAnual-proj[i-1].custoAnual)/proj[i-1].custoAnual*100).toFixed(1):null;
+    return`<tr><td><strong>${p.ano}</strong>${i===0?'<span class="tag" style="margin-left:6px">Atual</span>':''}</td>
+    <td>${p.nFunc}</td><td class="mono">${brl(p.custoMensal)}</td>
+    <td class="mono"><strong>${brl(p.custoAnual)}</strong></td>
+    <td class="mono">${brl(p.fgts*12)}</td><td class="mono">${brl(p.prov*12)}</td>
+    <td>${v!==null?`<span class="${+v>=0?'tu':'td'}">${+v>=0?'▲':'▼'} ${Math.abs(v)}%</span>`:'–'}</td>
+    <td class="mono">${((p.fr-1)*100).toFixed(1)}%</td></tr>`;});
+  document.getElementById('tbl-proj').innerHTML=`<table><thead><tr>
+    <th>Ano</th><th>Func.</th><th>Custo/mês</th><th>Custo Anual</th><th>FGTS/ano</th><th>Provisões/ano</th><th>Variação</th><th>Reajuste Acum.</th>
+  </tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+// IA ASSISTENTE — Gemini via Google Apps Script
+const AI_PROXY='https://script.google.com/macros/s/AKfycbwx7e8TLejtA54NmUXG5Z3MlutJLz4OMs7AQd4dISl2-SYw-RmTUucpt3cqpSi4eFunJQ/exec';
+let aiHistorico=[];
+
+async function aiEnviar(){
+  const inp=document.getElementById('ai-inp');
+  const msg=inp.value.trim();if(!msg)return;
+  inp.value='';
+  aiPerguntar(msg);
+}
+
+async function aiPerguntar(msg){
+  const msgs=document.getElementById('ai-msgs');
+  msgs.innerHTML+=`<div class="ai-msg user">${msg}</div>`;
+  msgs.innerHTML+=`<div class="ai-msg bot loading" id="ai-loading">⏳ Analisando dados...</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+
+  const ativos=allFunc.filter(r=>r.status!=='Inativo');
+  let folha=0,fgts=0,provisoes=0,reserva=0;
+  ativos.forEach(r=>{const c=calc(r);folha+=c.bruto;fgts+=c.fgts;provisoes+=c.d13+c.fer+c.ter;
+    const adm=r.data_admissao?new Date(r.data_admissao):new Date('2026-02-02');
+    const meses=Math.max(1,Math.round((new Date()-adm)/2592000000));
+    reserva+=calcResc(r,meses).total+(c.d13+c.fer+c.ter)*meses;
+  });
+
+  const contexto=`Você é o assistente financeiro da Vitagest Saúde Ltda, empresa no Simples Nacional prestando serviços à Prefeitura de Butiá/RS (Contrato 19/2026).
+
+DADOS ATUAIS:
+- Funcionários ativos: ${ativos.length}
+- Folha bruta mensal: R$ ${folha.toFixed(2)}
+- FGTS mensal (8%): R$ ${fgts.toFixed(2)}
+- Provisões mensais (13º+férias+1/3): R$ ${provisoes.toFixed(2)}
+- Custo real mensal: R$ ${(folha+fgts+provisoes).toFixed(2)}
+- Reserva necessária hoje: R$ ${reserva.toFixed(2)}
+
+HISTÓRICO:
+- Fev/2026: Folha R$39.732,57 | FGTS R$3.178,55 | INSS R$3.372,90 | ISSQN R$1.929,27 | Fatura R$96.463,67 | 13 func.
+- Mar/2026: Folha R$55.682,50 | FGTS R$4.333,57 | INSS R$3.844,51 | ISSQN R$2.612,91 | Fatura R$130.645,67 | 23 func.
+- Abr/2026: Folha R$62.407,07 | FGTS R$4.698,46 | INSS R$3.411,53 | ISSQN R$2.764,17 | 25 func.
+
+CARGOS:
+- Técnico(a) Enfermagem: bruto R$3.346,93 | FGTS R$267,75 | custo ~R$5.047/mês
+- Aux. Saúde Bucal: bruto R$2.070,56 | FGTS R$165,64 | custo ~R$3.119/mês
+- Visitador(a) PIM: bruto R$1.503,25 | FGTS R$120,26 | custo ~R$2.265/mês
+
+FUNCIONÁRIOS ATIVOS: ${ativos.map(r=>`${r.nome} (${r.cargo})`).join('; ')}
+
+Responda em português, de forma objetiva e com valores precisos. Para rescisão SJC: 13º prop. + férias prop. + 1/3 + aviso prévio (1 mês) + multa FGTS 40%.`;
+
+  // Histórico para contexto
+  aiHistorico.push({role:'user',parts:[{text:contexto+'\n\nPergunta: '+msg}]});
+
+  try{
+    const res=await fetch(AI_PROXY,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pergunta:msg,contexto})
+    });
+    const data=await res.json();
+    const resp=data.resposta||data.text||data.error||'Sem resposta.';
+    aiHistorico.push({role:'model',parts:[{text:resp}]});
+    const loading=document.getElementById('ai-loading');
+    if(loading)loading.remove();
+    msgs.innerHTML+=`<div class="ai-msg bot">${resp.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  }catch(e){
+    const loading=document.getElementById('ai-loading');
+    if(loading)loading.remove();
+    msgs.innerHTML+=`<div class="ai-msg bot">⚠️ Erro: ${e.message}. Verifique a conexão.</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  }
+}
+
+function registrarUpload(input){
+  const file=input.files[0];if(!file)return;
+  const info=document.getElementById('upload-info');
+  info.style.display='block';
+  info.innerHTML=`✅ Arquivo anexado: <strong>${file.name}</strong> (${(file.size/1024).toFixed(0)} KB) — registrado em ${new Date().toLocaleDateString('pt-BR')}. Preencha os valores abaixo e salve.`;
+  // Auto-preencher mês se possível
+  const mesMatch=file.name.match(/(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/i);
+  const mapa={jan:'01',fev:'02',mar:'03',abr:'04',mai:'05',jun:'06',jul:'07',ago:'08',set:'09',out:'10',nov:'11',dez:'12'};
+  if(mesMatch){
+    const m=mapa[mesMatch[0].toLowerCase()];
+    const ano=new Date().getFullYear();
+    const impMes=document.getElementById('imp-mes');
+    if(impMes) impMes.value=`${ano}-${m}`;
+  }
+}
+
+// UTILS
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function brl(v){return(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function fmtD(d){if(!d)return'–';try{return new Date(d+'T12:00:00').toLocaleDateString('pt-BR');}catch{return d;}}
+function fmtMes(m){if(!m)return'–';const[y,mo]=m.split('-');const ms=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];return`${ms[+mo-1]}/${y}`;}
+function badge(s){const m={'Ativo':'bg','Inativo':'br','Experiência':'by'};return`<span class="badge ${m[s]||'bgr'}">${s}</span>`;}
+function fi(l,v){return`<div><div style="font-size:.62rem;font-weight:700;color:var(--mu);text-transform:uppercase;margin-bottom:2px">${l}</div><div style="font-size:.8rem">${v||'–'}</div></div>`;}
+function bk(l,v){return`<div class="bk"><span class="bk-l">${l}</span><span class="bk-v">${v}</span></div>`;}
+let tT;
+function toast(msg,isErr){const t=document.getElementById('toast');t.textContent=msg;t.className='show'+(isErr?' err':'');clearTimeout(tT);tT=setTimeout(()=>{t.className='';},3500);}
+
+loadDash();
+</script>
+</body>
+</html>
