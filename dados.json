@@ -1,0 +1,489 @@
+{
+ "atualizadoEm": "07/07/2026",
+ "nota": "Fonte da verdade dos dados. Regras: contas fixas = Atum + contabilidade + impostos + folha; pagamento administrativo = 5% do recebido no mês; INSS lançado = DARF (retido - sal.família - sal.maternidade).",
+ "meses": [
+  {
+   "comp": "02/2026",
+   "bruta": 96463.67,
+   "issqn": 1929.27,
+   "proventos": 39732.57,
+   "inss": 3372.9,
+   "fgts": 3178.55,
+   "nf": 13,
+   "detalhe": false
+  },
+  {
+   "comp": "03/2026",
+   "bruta": 130645.67,
+   "issqn": 2612.91,
+   "proventos": 55682.5,
+   "inss": 3844.51,
+   "fgts": 4333.57,
+   "nf": 23,
+   "faturaLiquidaInformada": 128032.76,
+   "detalhe": false
+  },
+  {
+   "comp": "04/2026",
+   "bruta": 138208.67,
+   "issqn": 2764.17,
+   "proventos": 62407.07,
+   "inss": 3411.53,
+   "fgts": 4698.46,
+   "nf": 24,
+   "detalhe": false
+  },
+  {
+   "comp": "05/2026",
+   "bruta": 140336.81,
+   "issqn": 2806.74,
+   "proventos": 62759.46,
+   "inss": 2942.31,
+   "fgts": 4832.33,
+   "nf": 27,
+   "b365": 5113.81,
+   "i365": 102.28,
+   "detalhe": false
+  },
+  {
+   "comp": "06/2026",
+   "bruta": 164648.57,
+   "issqn": 3292.97,
+   "proventos": 75068.39,
+   "inss": 4022.3,
+   "fgts": 5817.04,
+   "nf": 24,
+   "b365": 25569.07,
+   "i365": 511.38,
+   "detalhe": true
+  }
+ ],
+ "caixa": {
+  "saldoInicial": 1,
+  "saldoReal": 140663.93,
+  "reajuste": 5,
+  "atualizadoEm": "07/07/2026",
+  "meses": [
+   {
+    "mes": "03/2026",
+    "entradas": 94534.4,
+    "salarios": 37195.94,
+    "impostos": 6551.45,
+    "servicos": 5099.25
+   },
+   {
+    "mes": "04/2026",
+    "entradas": 128032.76,
+    "salarios": 53680.85,
+    "impostos": 12224.47,
+    "servicos": 8143.26
+   },
+   {
+    "mes": "05/2026",
+    "entradas": 135444.5,
+    "salarios": 52386.19,
+    "impostos": 13322.76,
+    "servicos": 8079.88
+   },
+   {
+    "mes": "06/2026",
+    "entradas": 137530.07,
+    "salarios": 55959.68,
+    "impostos": 14610.35,
+    "servicos": 9068.75
+   },
+   {
+    "mes": "07/2026",
+    "entradas": 161355.6,
+    "salarios": 67188.62,
+    "impostos": 0,
+    "servicos": 8272.98,
+    "parcial": true
+   }
+  ],
+  "retiradas": [
+   {
+    "data": "2026-05-07",
+    "valor": 62000,
+    "desc": "Paula Botelho"
+   },
+   {
+    "data": "2026-05-07",
+    "valor": 3000,
+    "desc": "Paula Botelho"
+   },
+   {
+    "data": "2026-05-08",
+    "valor": 45000,
+    "desc": "Saque em espécie"
+   },
+   {
+    "data": "2026-06-19",
+    "valor": 50000,
+    "desc": "Paula Botelho"
+   }
+  ],
+  "futuros": [
+   {
+    "data": "2026-07-10",
+    "valor": 1149,
+    "desc": "Newtech Contabilidade (agendado)"
+   },
+   {
+    "data": "2026-07-20",
+    "valor": 5817.04,
+    "desc": "FGTS competência 06/2026 (agendado)"
+   },
+   {
+    "data": "2026-07-20",
+    "valor": 4022.3,
+    "desc": "INSS DARF competência 06/2026 (agendado)"
+   },
+   {
+    "data": "2026-07-31",
+    "valor": 8020,
+    "desc": "Simples Nacional 06/2026 (ESTIMATIVA ~4,9% — guia ainda não emitida)"
+   }
+  ]
+ },
+ "funcionarios": [
+  {
+   "nome": "Carmen Lucia Souza Krigger",
+   "cpf": "008.824.190-48",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Diheila Rodrigues Dias",
+   "cpf": "011.393.320-74",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Gabriele Caroline Junqueira Guterres",
+   "cpf": "034.894.880-83",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Gislaine Rodrigues dos Santos",
+   "cpf": "000.806.020-70",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Glaci Maria Martins Leite",
+   "cpf": "445.362.160-49",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Juliana Saraiva de Souza",
+   "cpf": "025.774.690-04",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Julya Rafaela Oliveira Salvador",
+   "cpf": "022.635.310-92",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Kellen Maciel Oliveira",
+   "cpf": "814.997.360-53",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Samantha Forte da Silva",
+   "cpf": "020.759.800-20",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Sonia Mara Nunes",
+   "cpf": "990.290.140-91",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Vera Lucia Escarcel de Souza",
+   "cpf": "964.759.190-04",
+   "cargo": "tec_enf",
+   "adm": "04/03/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Jessica Leine Rodrigues Moczulski",
+   "cpf": "050.796.090-44",
+   "cargo": "tec_enf",
+   "adm": "01/04/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Rubia Varreira Araujo",
+   "cpf": "025.241.910-36",
+   "cargo": "tec_enf",
+   "adm": "16/04/2026",
+   "st": "ativo",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Denise Patricio de Souza",
+   "cpf": "079.330.749-01",
+   "cargo": "tec_enf",
+   "adm": "26/05/2026",
+   "st": "ativo",
+   "ctr": "365",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Lucca Nunes da Silva",
+   "cpf": "031.940.630-06",
+   "cargo": "tec_enf",
+   "adm": "26/05/2026",
+   "st": "ativo",
+   "ctr": "365",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Daiana Nunes Nunes",
+   "cpf": "044.269.350-83",
+   "cargo": "tec_enf",
+   "adm": "26/05/2026",
+   "st": "ativo",
+   "ctr": "365",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Rosana Andrade Martins",
+   "cpf": "021.710.480-00",
+   "cargo": "tec_enf",
+   "adm": "26/05/2026",
+   "st": "ativo",
+   "ctr": "365",
+   "prov": 3346.93,
+   "liq": 3056.71,
+   "fgts": 267.75,
+   "inss": 290.22
+  },
+  {
+   "nome": "Mariane Kwiatkowski Santos Andrade",
+   "cpf": "022.257.950-10",
+   "cargo": "saude_bucal",
+   "adm": "02/02/2026",
+   "st": "ativo",
+   "prov": 2070.56,
+   "liq": 1908.53,
+   "fgts": 165.64,
+   "inss": 162.03
+  },
+  {
+   "nome": "Thaiana Silveira da Silva",
+   "cpf": "035.521.060-65",
+   "cargo": "saude_bucal",
+   "adm": "25/03/2026",
+   "st": "ativo",
+   "prov": 2070.56,
+   "liq": 1908.53,
+   "fgts": 165.64,
+   "inss": 162.03
+  },
+  {
+   "nome": "Susana dos Santos Altamiranda",
+   "cpf": "002.521.670-82",
+   "cargo": "saude_bucal",
+   "adm": "02/02/2026",
+   "st": "afastado",
+   "prov": 1746.36,
+   "liq": 0,
+   "fgts": 0,
+   "inss": 0,
+   "demInfo": "Afastada por doença (INSS) desde 09/03/2026 — sem custo de folha enquanto durar o afastamento."
+  },
+  {
+   "nome": "Cibele Catrine Nogueira Garcia",
+   "cpf": "050.180.240-11",
+   "cargo": "visitador",
+   "adm": "02/03/2026",
+   "st": "ativo",
+   "prov": 1570.79,
+   "liq": 1458.05,
+   "fgts": 120.26,
+   "inss": 112.74,
+   "demInfo": "Licença-maternidade de 13/04/2026 a 10/08/2026 — salário-maternidade compensado no DARF."
+  },
+  {
+   "nome": "Daniela Teresinha Moraes Goulart Lima",
+   "cpf": "029.450.580-65",
+   "cargo": "visitador",
+   "adm": "02/03/2026",
+   "st": "ativo",
+   "prov": 1638.33,
+   "liq": 1525.59,
+   "fgts": 120.26,
+   "inss": 112.74
+  },
+  {
+   "nome": "Franciele Carneiro Silva da Silva",
+   "cpf": "037.016.990-54",
+   "cargo": "visitador",
+   "adm": "02/03/2026",
+   "st": "ativo",
+   "prov": 1570.79,
+   "liq": 1458.05,
+   "fgts": 120.26,
+   "inss": 112.74
+  },
+  {
+   "nome": "Iara Janete de Caldas Martins",
+   "cpf": "351.684.040-49",
+   "cargo": "visitador",
+   "adm": "02/03/2026",
+   "st": "ativo",
+   "prov": 1503.25,
+   "liq": 1390.51,
+   "fgts": 120.26,
+   "inss": 112.74
+  },
+  {
+   "nome": "Josiane Lucas Soares Souza",
+   "cpf": "004.933.240-62",
+   "cargo": "visitador",
+   "adm": "02/03/2026",
+   "st": "ativo",
+   "prov": 1570.79,
+   "liq": 1458.05,
+   "fgts": 120.26,
+   "inss": 112.74
+  },
+  {
+   "nome": "Joyce Teresinha Goulart de Azevedo Ramos",
+   "cpf": "011.799.550-99",
+   "cargo": "visitador",
+   "adm": "02/03/2026",
+   "st": "ativo",
+   "prov": 1570.79,
+   "liq": 1458.05,
+   "fgts": 120.26,
+   "inss": 112.74
+  },
+  {
+   "nome": "Sabrina Borges Cardoso",
+   "cpf": "030.924.200-20",
+   "cargo": "visitador",
+   "adm": "02/03/2026",
+   "st": "ativo",
+   "prov": 1705.87,
+   "liq": 1593.13,
+   "fgts": 120.26,
+   "inss": 112.74
+  },
+  {
+   "nome": "Magda Suzana Flores da Silva",
+   "cpf": "656.215.490-15",
+   "cargo": "visitador",
+   "adm": "08/06/2026",
+   "st": "ativo",
+   "prov": 1152.49,
+   "liq": 1066.06,
+   "fgts": 92.19,
+   "inss": 86.43
+  },
+  {
+   "nome": "Márcia Fontes Santana",
+   "cpf": "993.599.955-68",
+   "cargo": "tec_enf",
+   "adm": "02/02/2026",
+   "st": "demitido",
+   "prov": 0,
+   "liq": 0,
+   "fgts": 0,
+   "inss": 0,
+   "demInfo": "Demitida 02/03/2026 — rescisão de contrato de experiência, antecipada pela empregada (pedido). Sem multa de 40%."
+  },
+  {
+   "nome": "Eliane Nunes Mariani",
+   "cpf": "778.465.590-87",
+   "cargo": "tec_enf",
+   "adm": "04/03/2026",
+   "st": "demitido",
+   "prov": 0,
+   "liq": 0,
+   "fgts": 0,
+   "inss": 0,
+   "demInfo": "Demitida 15/04/2026."
+  }
+ ]
+}
