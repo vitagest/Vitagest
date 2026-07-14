@@ -1,0 +1,220 @@
+{
+ "name": "Vitagest — Drive para dados.json",
+ "flow": [
+  {
+   "id": 1,
+   "module": "google-drive:watchFilesInAFolder",
+   "version": 4,
+   "parameters": {
+    "__IMTCONN__": null,
+    "destination": "drive",
+    "select": "select",
+    "folderId": "1bB2zlXLRmZ6MGSJUzqIrXok1HbYHlFpa",
+    "formatFile": "false",
+    "limit": "1"
+   },
+   "mapper": {},
+   "metadata": {
+    "designer": {
+     "x": 0,
+     "y": 0
+    }
+   }
+  },
+  {
+   "id": 2,
+   "module": "google-drive:downloadAFile",
+   "version": 4,
+   "parameters": {
+    "__IMTCONN__": null
+   },
+   "mapper": {
+    "file": "{{1.id}}",
+    "formatFile": "false"
+   },
+   "metadata": {
+    "designer": {
+     "x": 300,
+     "y": 0
+    }
+   }
+  },
+  {
+   "id": 3,
+   "module": "http:ActionSendData",
+   "version": 3,
+   "parameters": {
+    "handleErrors": false,
+    "useNewZLibDeCompress": true
+   },
+   "mapper": {
+    "url": "https://raw.githubusercontent.com/vitagest/Vitagest/main/dados.json",
+    "method": "get",
+    "headers": [],
+    "qs": [],
+    "parseResponse": false,
+    "timeout": "",
+    "shareCookies": false,
+    "ca": "",
+    "rejectUnauthorized": true,
+    "followRedirect": true,
+    "useQuerystring": false,
+    "gzip": true,
+    "useMtls": false
+   },
+   "metadata": {
+    "designer": {
+     "x": 600,
+     "y": 0
+    }
+   }
+  },
+  {
+   "id": 4,
+   "module": "http:ActionSendData",
+   "version": 3,
+   "parameters": {
+    "handleErrors": false,
+    "useNewZLibDeCompress": true
+   },
+   "mapper": {
+    "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=CHAVE_GEMINI_AQUI",
+    "method": "post",
+    "headers": [
+     {
+      "name": "Content-Type",
+      "value": "application/json"
+     }
+    ],
+    "qs": [],
+    "bodyType": "raw",
+    "contentType": "application/json",
+    "data": "{\n \"contents\":[{\"parts\":[\n  {\"text\": \"DADOS_ATUAIS:\\n{{replace(replace(3.data; \\\"\\\\\\\"\\\"; \\\"\\\\\\\\\\\\\\\"\\\"); newline; \\\" \\\")}}\"},\n  {\"inline_data\":{\"mime_type\":\"{{2.mimeType}}\",\"data\":\"{{toBase64(2.data)}}\"}},\n  {\"text\": \"Voce atualiza o arquivo dados.json do painel financeiro da Vitagest Saude Ltda. Recebe: (1) DADOS_ATUAIS, o dados.json completo de hoje; (2) um documento PDF, que pode ser uma FATURA/nota fiscal ou um EXTRATO bancario Bradesco. TAREFA: devolver o dados.json COMPLETO e atualizado. REGRAS OBRIGATORIAS: 1) Preserve TODO o conteudo existente. Nunca apague meses, funcionarios, retiradas ou campos que ja existem. Apenas acrescente ou corrija o que o documento comprova. 2) Se for FATURA: atualize ou crie o item em meses[] com comp no formato MM/AAAA, e os campos bruta (valor bruto), issqn (ISSQN 2% retido), nf (numero de postos faturados). Se ja existir o mesmo comp, atualize esse item em vez de duplicar. 3) Se for EXTRATO: atualize caixa.saldoReal com o saldo final do extrato e caixa.atualizadoEm com a data do extrato no formato DD/MM/AAAA. Atualize ou crie o item em caixa.meses[] com mes no formato MM/AAAA e os campos entradas, salarios, impostos, servicos. 4) NUNCA classifique um lancamento do extrato por conta propria com certeza. Ao criar ou alterar um item de caixa.meses[] a partir de extrato, inclua o campo \\\"conferido\\\": false nesse item. Nao remova conferido:false de itens que ja o tenham. 5) Transferencias para socios (ex.: Paula Botelho) e saques em especie sao RETIRADAS: acrescente em caixa.retiradas[] com data (AAAA-MM-DD), valor e desc. NAO os conte como salarios, impostos nem servicos. 6) Salarios = pagamentos de folha aos funcionarios. Impostos = DARF, FGTS, Simples, ISS. Servicos = contabilidade, taxas bancarias, pagamento administrativo. Na duvida, deixe o valor fora e nao invente. 7) Atualize o campo atualizadoEm da raiz para a data de hoje no formato DD/MM/AAAA. 8) Use ponto como separador decimal. Nao arredonde. Nao invente numeros que nao estejam no documento. SAIDA: responda APENAS com o JSON completo, sem markdown, sem crases, sem comentarios e sem texto antes ou depois.\"}\n ]}],\n \"generationConfig\":{\"response_mime_type\":\"application/json\",\"temperature\":0}\n}",
+    "parseResponse": true,
+    "timeout": "",
+    "shareCookies": false,
+    "ca": "",
+    "rejectUnauthorized": true,
+    "followRedirect": true,
+    "useQuerystring": false,
+    "gzip": true,
+    "useMtls": false
+   },
+   "metadata": {
+    "designer": {
+     "x": 900,
+     "y": 0
+    }
+   }
+  },
+  {
+   "id": 5,
+   "module": "http:ActionSendData",
+   "version": 3,
+   "parameters": {
+    "handleErrors": false,
+    "useNewZLibDeCompress": true
+   },
+   "mapper": {
+    "url": "https://api.github.com/repos/vitagest/Vitagest/contents/dados.json",
+    "method": "get",
+    "headers": [
+     {
+      "name": "Authorization",
+      "value": "Bearer CHAVE_GITHUB_AQUI"
+     },
+     {
+      "name": "Accept",
+      "value": "application/vnd.github+json"
+     },
+     {
+      "name": "User-Agent",
+      "value": "make-vitagest"
+     }
+    ],
+    "qs": [],
+    "parseResponse": true,
+    "timeout": "",
+    "shareCookies": false,
+    "ca": "",
+    "rejectUnauthorized": true,
+    "followRedirect": true,
+    "useQuerystring": false,
+    "gzip": true,
+    "useMtls": false
+   },
+   "metadata": {
+    "designer": {
+     "x": 1200,
+     "y": 0
+    }
+   }
+  },
+  {
+   "id": 6,
+   "module": "http:ActionSendData",
+   "version": 3,
+   "parameters": {
+    "handleErrors": false,
+    "useNewZLibDeCompress": true
+   },
+   "mapper": {
+    "url": "https://api.github.com/repos/vitagest/Vitagest/contents/dados.json",
+    "method": "put",
+    "headers": [
+     {
+      "name": "Authorization",
+      "value": "Bearer CHAVE_GITHUB_AQUI"
+     },
+     {
+      "name": "Accept",
+      "value": "application/vnd.github+json"
+     },
+     {
+      "name": "User-Agent",
+      "value": "make-vitagest"
+     }
+    ],
+    "qs": [],
+    "bodyType": "raw",
+    "contentType": "application/json",
+    "data": "{\n \"message\": \"Atualizacao automatica via Drive: {{1.name}}\",\n \"content\": \"{{toBase64(4.data.candidates[1].content.parts[1].text)}}\",\n \"sha\": \"{{5.data.sha}}\",\n \"branch\": \"main\"\n}",
+    "parseResponse": true,
+    "timeout": "",
+    "shareCookies": false,
+    "ca": "",
+    "rejectUnauthorized": true,
+    "followRedirect": true,
+    "useQuerystring": false,
+    "gzip": true,
+    "useMtls": false
+   },
+   "metadata": {
+    "designer": {
+     "x": 1500,
+     "y": 0
+    }
+   }
+  }
+ ],
+ "metadata": {
+  "instant": false,
+  "version": 1,
+  "scenario": {
+   "roundtrips": 1,
+   "maxErrors": 3,
+   "autoCommit": true,
+   "autoCommitTriggerLast": true,
+   "sequential": false,
+   "slots": null,
+   "confidential": false,
+   "dataloss": false,
+   "dlq": false,
+   "freshVariables": false
+  },
+  "designer": {
+   "orphans": []
+  },
+  "zone": "us2.make.com"
+ }
+}
