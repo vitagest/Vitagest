@@ -951,16 +951,25 @@ async function carregarDados(){
     const r=await fetch('dados.json?t='+Date.now(),{cache:'no-store'});
     if(!r.ok)return;
     const d=await r.json();
-    if(d.meses)MESES=d.meses;
-    if(d.caixa)CAIXA=d.caixa;
+    if(d.meses){MESES=d.meses;saveM(MESES);}
+    if(d.caixa){CAIXA=d.caixa;saveR(CAIXA);}
     if(d.funcionarios){FUNCIONARIOS.length=0;d.funcionarios.forEach(f=>FUNCIONARIOS.push(f));}
-    if(d.atualizadoEm){const s=document.getElementById('dashSub');if(s)s.dataset.att=d.atualizadoEm;}
+    if(d.atualizadoEm){
+      const s=document.getElementById('dashSub');
+      if(s){s.dataset.att=d.atualizadoEm;
+        let b=document.getElementById('attBadge');
+        if(!b){b=document.createElement('div');b.id='attBadge';
+          b.style.cssText='font-size:12px;opacity:.7;margin-top:4px';s.appendChild(b);}
+        b.textContent='Atualizado automaticamente em '+d.atualizadoEm;}
+    }
+    fillMesSelect(document.getElementById('margemMes'));
     const cur=(document.querySelector('.view.on')||{}).id;
     const v=cur?cur.replace('v-',''):'dash';
     if(RENDER[v])RENDER[v]();
   }catch(e){/* offline: segue com dados embutidos */}
 }
-// carregarDados();  // desativado nesta versão: dados já embutidos abaixo
+carregarDados();               // LIGADO: o site busca os números sozinho
+setInterval(carregarDados,300000);  // e reconfere a cada 5 minutos
 </script>
 </body>
 </html>
