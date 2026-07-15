@@ -549,7 +549,7 @@ function renderDash(){
     {label:'Hoje',data:lx.map((_,i)=>i===idx?ly[i]:null),borderColor:C.rose,pointRadius:5,pointBackgroundColor:C.rose}]},
     options:{plugins:{title:{display:true,text:'Reserva de rescisão ao longo do contrato'}},scales:{y:{ticks:{callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
   document.getElementById('dashAlert').innerHTML=
-    `<b>Risco trabalhista a provisionar.</b> A equipe ativa é de <b>${ativos} pessoas</b>. Encerrar todas sem justa causa hoje custaria <b>${BRL(reserva)}</b> — esse é o caixa mínimo de proteção. A reserva sobe todo mês com a multa de 40% do FGTS acumulado. A Márcia já saiu (pedido em contrato de experiência, custo zero de multa) e não precisa de provisão futura.`;
+    `<b>Risco trabalhista a provisionar.</b> A equipe ativa é de <b>${ATIVAS().length} pessoas</b>. Encerrar todas sem justa causa hoje custaria <b>${BRL(reserva)}</b> — esse é o caixa mínimo de proteção. A reserva sobe todo mês com a multa de 40% do FGTS acumulado. A Márcia já saiu (pedido em contrato de experiência, custo zero de multa) e não precisa de provisão futura.`;
 }
 
 function renderEquipe(){
@@ -941,7 +941,7 @@ document.getElementById('rReset').onclick=()=>{if(confirm('Restaurar as retirada
 fillMesSelect(document.getElementById('margemMes'));
 initChat();
 addMsg('Olá! Sou o assistente da Vitagest. Posso calcular reserva de rescisão, margem, encargos e o custo de demitir cada funcionária. O que deseja saber?','bot');
-go('dash');
+try{ go('dash'); }catch(e){ console.error('erro ao montar o dashboard:',e); }
 
 /* ---------- dados.json: fonte da verdade publicada no GitHub/Vercel ----------
    O Claude atualiza o dados.json no repositório; o site recarrega os números
