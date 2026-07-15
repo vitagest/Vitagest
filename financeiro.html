@@ -274,8 +274,9 @@ input:focus,select:focus{outline:2px solid var(--leaf);border-color:transparent}
         <button class="btn" id="resCalc">Recalcular</button>
       </div>
       <div class="grid kpis" id="resKpis"></div>
+      <div id="resResumo" style="margin-top:16px"></div>
       <div class="card overflow" style="margin-top:16px"><table id="tReserva"></table></div>
-      <div class="note">Tempo de casa calculado da admissão de cada funcionária até a data de referência. Aviso prévio indenizado integra o tempo para 13º e férias. FGTS acumulado = depósito mensal × meses.</div>
+      <div class="note" id="resNota"></div>
     </section>
 
     <!-- SIMULADOR -->
@@ -441,11 +442,16 @@ function rescisao(base,fgtsMes,meses,tipo){
   const comMulta=(ind||trab);
   const mp=meses+(ind?1:0);
   const aviso=ind?base*(avisoDias/30):0;
-  const decimo=base*(mp/12), ferias=base*(mp/12)*(4/3);
+  const decimo=base*(mp/12);
+  // férias: períodos completos de 12 meses = vencidas; o resto = proporcionais. 1/3 incide sobre as duas.
+  const periodos=Math.floor(mp/12), resto=mp-periodos*12;
+  const feriasVenc=base*periodos, feriasProp=base*(resto/12);
+  const terco=(feriasVenc+feriasProp)/3;
+  const ferias=feriasVenc+feriasProp+terco;
   const fgtsAcum=fgtsMes*(meses+(trab?1:0)), multa=comMulta?fgtsAcum*0.40:0;
   // folha do mês de aviso (só existe no trabalhado; é custo, mas com serviço prestado e faturado)
   const folhaAviso=trab?base:0, fgtsAvisoMes=trab?fgtsMes:0;
-  return{avisoDias,aviso,decimo,ferias,fgtsAcum,multa,folhaAviso,fgtsAvisoMes,total:aviso+decimo+ferias+multa};
+  return{avisoDias,aviso,decimo,feriasVenc,feriasProp,terco,ferias,fgtsAcum,multa,folhaAviso,fgtsAvisoMes,total:aviso+decimo+ferias+multa};
 }
 function reservaEquipe(refYM,tipo){
   let t=0;ATIVAS().forEach(f=>{const c=CARGOS[f.cargo];t+=rescisao(c.rescBase,c.rescFgts,mesesAvos(f.adm,refYM),tipo).total;});return t;
@@ -630,20 +636,63 @@ function renderMargem(){
 
 function renderReserva(){
   const ref=document.getElementById('resRef').value||REF_HOJE,tipo=document.getElementById('resTipo').value;
-  let rows='',T={aviso:0,decimo:0,ferias:0,multa:0,total:0};
-  [...ATIVAS()].sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(f=>{const c=CARGOS[f.cargo],meses=mesesAvos(f.adm,ref),r=rescisao(c.rescBase,c.rescFgts,meses,tipo);
-    T.aviso+=r.aviso;T.decimo+=r.decimo;T.ferias+=r.ferias;T.multa+=r.multa;T.total+=r.total;
+  const trab=(tipo==='sjc_trab');
+  let rows='',T={aviso:0,decimo:0,fv:0,fp:0,terco:0,multa:0,total:0,folhaAviso:0,fgtsAc:0};
+  [...ATIVAS()].sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(f=>{
+    const c=CARGOS[f.cargo],meses=mesesAvos(f.adm,ref),r=rescisao(c.rescBase,c.rescFgts,meses,tipo);
+    T.aviso+=r.aviso;T.decimo+=r.decimo;T.fv+=r.feriasVenc;T.fp+=r.feriasProp;T.terco+=r.terco;
+    T.multa+=r.multa;T.total+=r.total;T.folhaAviso+=r.folhaAviso+r.fgtsAvisoMes;T.fgtsAc+=r.fgtsAcum;
     rows+=`<tr><td><b>${f.nome}</b></td><td><span class="tag ${c.tag}">${c.nome}</span></td><td class="r">${meses}</td>
-      <td class="r num">${N(r.aviso)}</td><td class="r num">${N(r.decimo)}</td><td class="r num">${N(r.ferias)}</td>
-      <td class="r num">${N(r.multa)}</td><td class="r num"><b>${N(r.total)}</b></td></tr>`;});
+      <td class="r num">${N(r.feriasVenc)}</td><td class="r num">${N(r.feriasProp)}</td><td class="r num">${N(r.terco)}</td>
+      <td class="r num">${N(r.decimo)}</td><td class="r num">${N(r.multa)}</td>
+      ${trab?'':`<td class="r num">${N(r.aviso)}</td>`}
+      <td class="r num"><b>${N(r.total)}</b></td></tr>`;});
+
   document.getElementById('resKpis').innerHTML=
-    kpi('Reserva total',BRL(T.total),`${ATIVAS().length} ativas · ref. ${ref}`,'warn')+
-    kpi('Multa 40% FGTS',BRL(T.multa),(tipo==='sjc'||tipo==='sjc_trab')?'aplicável':'não se aplica')+
-    kpi('13º + férias',BRL(T.decimo+T.ferias),'proporcionais')+
-    kpi('Média por pessoa',BRL(T.total/ATIVAS().length),'equipe ativa');
-  rows+=`<tr class="tot"><td colspan="3">TOTAL</td><td class="r num">${N(T.aviso)}</td><td class="r num">${N(T.decimo)}</td><td class="r num">${N(T.ferias)}</td><td class="r num">${N(T.multa)}</td><td class="r num">${N(T.total)}</td></tr>`;
+    kpi('🏦 RESERVA TOTAL',BRL(T.total),`${ATIVAS().length} com vínculo · ref. ${ref}`,'warn')+
+    kpi('🏖️ Férias + ⅓',BRL(T.fv+T.fp+T.terco),'vencidas + proporcionais')+
+    kpi('🎁 13º proporcional',BRL(T.decimo),'avos do ano')+
+    kpi('⚖️ Multa 40% FGTS',BRL(T.multa),(tipo==='sjc'||trab)?'aplicável':'não se aplica');
+
+  // ---- resumo verba a verba (a leitura principal) ----
+  const linha=(nome,valor,expl,forte)=>`<tr${forte?' class="tot"':''}>
+      <td>${forte?'<b>'+nome+'</b>':nome}</td>
+      <td class="r num">${forte?'<b>'+BRL(valor)+'</b>':BRL(valor)}</td>
+      <td style="font-size:12px;color:var(--muted,#5f726a)">${expl}</td></tr>`;
+  document.getElementById('resResumo').innerHTML=`
+    <div class="card overflow"><table>
+      <thead><tr><th>Verba rescisória</th><th class="r" style="width:160px">Valor</th><th>O que é</th></tr></thead>
+      <tbody>
+      ${linha('Férias vencidas',T.fv,'períodos de 12 meses já completos — férias que a pessoa não tirou')}
+      ${linha('Férias proporcionais',T.fp,'avos do período em curso')}
+      ${linha('1/3 constitucional',T.terco,'um terço sobre as férias acima — obrigatório')}
+      ${linha('13º proporcional',T.decimo,'avos do ano até a saída')}
+      ${linha('Multa 40% do FGTS',T.multa,'40% de todo o FGTS depositado ('+BRL(T.fgtsAc)+') — só na dispensa sem justa causa')}
+      ${trab
+        ? linha('Aviso prévio',0,'<b>trabalhado</b> — a equipe cumpre o aviso, então não há indenização')
+        : linha('Aviso prévio indenizado',T.aviso,'pago para a saída ser imediata — 30 dias + 3 por ano de casa')}
+      ${linha('RESCISÃO — TOTAL',T.total,'é isso que sai do caixa no acerto',true)}
+      </tbody>
+    </table></div>
+    ${trab?`<div class="card" style="margin-top:12px;border-left:4px solid var(--amber,#bd7414)">
+      <div style="font-weight:800;margin-bottom:6px">📆 Fora da rescisão: a folha do mês de aviso — ${BRL(T.folhaAviso)}</div>
+      <div style="font-size:13px;line-height:1.55">Durante o aviso a equipe <b>trabalha</b>, então esse mês sai como folha normal (salários + FGTS 8%), e não como verba rescisória. Ele não está somado nos ${BRL(T.total)} acima. Em compensação, é um mês de serviço prestado e <b>faturado à Prefeitura</b> — na prática, se paga com a própria fatura.
+      <br><br><b>Caixa necessário no encerramento:</b> ${BRL(T.total)} de rescisão <b>+</b> ${BRL(T.folhaAviso)} da folha do aviso = <b>${BRL(T.total+T.folhaAviso)}</b>.</div></div>`:''}`;
+
+  rows+=`<tr class="tot"><td colspan="3">TOTAL</td>
+    <td class="r num">${N(T.fv)}</td><td class="r num">${N(T.fp)}</td><td class="r num">${N(T.terco)}</td>
+    <td class="r num">${N(T.decimo)}</td><td class="r num">${N(T.multa)}</td>
+    ${trab?'':`<td class="r num">${N(T.aviso)}</td>`}
+    <td class="r num">${N(T.total)}</td></tr>`;
   document.getElementById('tReserva').innerHTML=
-    `<thead><tr><th>Funcionária</th><th>Cargo</th><th class="r">Meses</th><th class="r">Aviso</th><th class="r">13º</th><th class="r">Férias+⅓</th><th class="r">Multa 40%</th><th class="r">Total</th></tr></thead><tbody>${rows}</tbody>`;
+    `<thead><tr><th>Funcionária</th><th>Cargo</th><th class="r">Meses</th>
+      <th class="r">Férias venc.</th><th class="r">Férias prop.</th><th class="r">1/3</th>
+      <th class="r">13º</th><th class="r">Multa 40%</th>${trab?'':'<th class="r">Aviso</th>'}
+      <th class="r">Total</th></tr></thead><tbody>${rows}</tbody>`;
+
+  document.getElementById('resNota').innerHTML= trab
+    ? `Cenário: <b>sem justa causa com aviso prévio trabalhado</b> — o padrão da Vitagest. Como a pessoa cumpre o aviso, ele não é projetado nos avos de férias e 13º (que ficam menores), mas gera <b>mais um mês de depósito de FGTS</b>, o que aumenta a multa de 40%. Tempo de casa contado da admissão até ${ref}. Os valores usam o <b>salário-base do cargo</b> — para provisão está correto; numa rescisão real, vale o salário individual da folha.`
+    : `Cenário: <b>aviso prévio indenizado</b> — saída imediata. O aviso projeta <b>+1 mês</b> no tempo de casa, aumentando férias e 13º. Tempo de casa contado da admissão até ${ref}. Os valores usam o <b>salário-base do cargo</b>.`;
 }
 
 function renderSim(){
