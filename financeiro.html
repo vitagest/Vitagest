@@ -270,7 +270,7 @@ input:focus,select:focus{outline:2px solid var(--leaf);border-color:transparent}
       <div class="controls card" style="margin-bottom:16px">
         <div class="field" style="max-width:180px"><label>Data de referência</label><input id="resRef" type="month" value="2026-06"></div>
         <div class="field" style="max-width:240px"><label>Tipo de desligamento</label>
-          <select id="resTipo"><option value="sjc">Sem justa causa (multa 40%)</option><option value="termino">Término de contrato</option><option value="pedido">Pedido de demissão</option></select></div>
+          <select id="resTipo"><option value="sjc_trab">Sem justa causa · aviso trabalhado</option><option value="sjc">Sem justa causa · aviso indenizado</option><option value="termino">Término de contrato</option><option value="pedido">Pedido de demissão</option></select></div>
         <button class="btn" id="resCalc">Recalcular</button>
       </div>
       <div class="grid kpis" id="resKpis"></div>
@@ -285,7 +285,7 @@ input:focus,select:focus{outline:2px solid var(--leaf);border-color:transparent}
         <div class="field" style="max-width:300px"><label>Funcionária</label><select id="simFunc"></select></div>
         <div class="field" style="max-width:150px"><label>Meses trabalhados</label><input id="simMeses" type="number" min="1" value="4"></div>
         <div class="field" style="max-width:230px"><label>Tipo</label>
-          <select id="simTipo"><option value="sjc">Sem justa causa</option><option value="termino">Término de contrato</option><option value="pedido">Pedido de demissão</option></select></div>
+          <select id="simTipo"><option value="sjc_trab">Sem justa causa · aviso trabalhado</option><option value="sjc">Sem justa causa · aviso indenizado</option><option value="termino">Término de contrato</option><option value="pedido">Pedido de demissão</option></select></div>
         <button class="btn" id="simCalc">Simular</button>
       </div>
       <div class="grid kpis" id="simKpis"></div>
@@ -434,14 +434,25 @@ function mesesAvos(adm,refYM){
 }
 function rescisao(base,fgtsMes,meses,tipo){
   const anos=Math.floor(meses/12), avisoDias=Math.min(90,30+anos*3);
-  const ind=(tipo==='sjc'), mp=meses+(ind?1:0);
+  // sjc      = sem justa causa, aviso INDENIZADO (projeta +1 mês nos avos, paga o aviso)
+  // sjc_trab = sem justa causa, aviso TRABALHADO (não projeta; aviso vira folha normal;
+  //            o mês trabalhado gera mais um depósito de FGTS, que entra na base da multa)
+  const ind=(tipo==='sjc'), trab=(tipo==='sjc_trab');
+  const comMulta=(ind||trab);
+  const mp=meses+(ind?1:0);
   const aviso=ind?base*(avisoDias/30):0;
   const decimo=base*(mp/12), ferias=base*(mp/12)*(4/3);
-  const fgtsAcum=fgtsMes*meses, multa=(tipo==='sjc')?fgtsAcum*0.40:0;
-  return{avisoDias,aviso,decimo,ferias,fgtsAcum,multa,total:aviso+decimo+ferias+multa};
+  const fgtsAcum=fgtsMes*(meses+(trab?1:0)), multa=comMulta?fgtsAcum*0.40:0;
+  // folha do mês de aviso (só existe no trabalhado; é custo, mas com serviço prestado e faturado)
+  const folhaAviso=trab?base:0, fgtsAvisoMes=trab?fgtsMes:0;
+  return{avisoDias,aviso,decimo,ferias,fgtsAcum,multa,folhaAviso,fgtsAvisoMes,total:aviso+decimo+ferias+multa};
 }
 function reservaEquipe(refYM,tipo){
   let t=0;ATIVAS().forEach(f=>{const c=CARGOS[f.cargo];t+=rescisao(c.rescBase,c.rescFgts,mesesAvos(f.adm,refYM),tipo).total;});return t;
+}
+// custo do mês de aviso trabalhado (salários + FGTS) — sai do caixa, mas com serviço prestado e faturado
+function folhaAvisoEquipe(refYM){
+  let t=0;ATIVAS().forEach(f=>{const c=CARGOS[f.cargo];const r=rescisao(c.rescBase,c.rescFgts,mesesAvos(f.adm,refYM),'sjc_trab');t+=r.folhaAviso+r.fgtsAvisoMes;});return t;
 }
 const mesDetalhe=()=>MESES.find(m=>m.detalhe)||MESES[0];
 const custoEmpregador=m=>m.proventos+m.fgts;
@@ -464,7 +475,7 @@ function renderDash(){
     sel.innerHTML=MESES.map(m=>`<option value="${m.comp}"${m.comp===def?' selected':''}>${m.comp}</option>`).join('');
     sel.dataset.filled=1;sel.onchange=renderDash;}
   const md=MESES.find(m=>m.comp===sel.value)||mesDetalhe();
-  const mg=margem(md,6),reserva=reservaEquipe(REF_HOJE,'sjc'),temFolha=md.proventos>0;
+  const mg=margem(md,6),reserva=reservaEquipe(REF_HOJE,'sjc_trab'),temFolha=md.proventos>0;
   const subF=md.detalhe?'1 afastada (doença) · 1 desligada no mês':(md.nf?md.nf+' vinculados ao contrato':'—');
   document.getElementById('dashSub').innerHTML=`Vitagest Saúde Ltda · Contratos Butiá nº 19/2026 e nº 365/2026 · referência <b>${md.comp}</b>`;
   document.getElementById('dashKpis').innerHTML=
@@ -475,14 +486,14 @@ function renderDash(){
   // ----- reserva para encerrar (folha do mês + rescisão da equipe) -----
   const _compl=MESES.filter(mm=>mm.proventos>0), _last=_compl[_compl.length-1];
   const folhaMes=_last?_last.proventos:0;
-  const rescSJC=reservaEquipe(REF_HOJE,'sjc'), rescTerm=reservaEquipe(REF_HOJE,'termino');
+  const rescSJC=reservaEquipe(REF_HOJE,'sjc_trab'), rescInd=reservaEquipe(REF_HOJE,'sjc'), folhaAviso=folhaAvisoEquipe(REF_HOJE);
   const reservaTotal=folhaMes+rescSJC;
   document.getElementById('reservaTotalKpis').innerHTML=
     kpi('💰 Folha do mês',BRL(folhaMes),'salários em curso ('+(_last?_last.comp:'—')+')')+
-    kpi('⚖️ Rescisão da equipe',BRL(rescSJC),ATIVAS().length+' ativas · sem justa causa')+
-    kpi('🏦 RESERVA TOTAL HOJE',BRL(reservaTotal),'folha + rescisão · demitir todos hoje','warn')+
-    kpi('Se fosse término de contrato',BRL(folhaMes+rescTerm),'sem multa de 40%','accent');
-  document.getElementById('reservaTotalNote').innerHTML=`<b>Esse é o valor que você deve manter em caixa.</b> Encerrar a operação hoje custa a folha do mês em curso (${BRL(folhaMes)}) somada a todas as verbas rescisórias (${BRL(rescSJC)} sem justa causa) = <b>${BRL(reservaTotal)}</b>. Quando o <b>contrato 19/2026 chegar ao fim</b>, o desligamento parte do empregador, então vale o cenário sem justa causa, com multa de 40% do FGTS. O detalhamento pessoa a pessoa está na aba "Reserva de rescisão".`;
+    kpi('⚖️ Rescisão da equipe',BRL(rescSJC),ATIVAS().length+' com vínculo · aviso trabalhado')+
+    kpi('🏦 RESERVA TOTAL HOJE',BRL(reservaTotal),'folha + rescisão · aviso trabalhado','warn')+
+    kpi('📆 Folha do mês de aviso',BRL(folhaAviso),'trabalhado e faturado à Prefeitura','accent');
+  document.getElementById('reservaTotalNote').innerHTML=`<b>Esse é o valor que você deve manter em caixa.</b> Encerrar a operação hoje custa a folha do mês em curso (${BRL(folhaMes)}) somada às verbas rescisórias (${BRL(rescSJC)}) = <b>${BRL(reservaTotal)}</b>. O cenário adotado é <b>sem justa causa com aviso prévio trabalhado</b>: a equipe cumpre o aviso, então não há aviso indenizado — em vez disso entra mais uma folha (${BRL(folhaAviso)}), que é paga com o faturamento desse mesmo mês. Se o desligamento fosse de surpresa, com <b>aviso indenizado</b>, a rescisão saltaria para ${BRL(rescInd)}. Quando o <b>contrato 19/2026 chegar ao fim</b>, o desligamento parte do empregador, com multa de 40% do FGTS. O detalhamento pessoa a pessoa está na aba "Reserva de rescisão".`;
   // ----- resumo por mês (cada competência separada) -----
   const cardCost=mm=>mm.proventos>0?(mm.proventos+mm.fgts+mm.bruta*0.06):null;
   document.getElementById('mesCards').innerHTML=MESES.map(mm=>{
@@ -541,7 +552,7 @@ function renderDash(){
     options:{plugins:{title:{display:true,text:`Encargos · ${md.comp}`},legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$'+v}}}}});
   const xs=[],ys=[];for(let i=1;i<=12;i++){const ym='2026-'+String(i<7?i+5:i-7).padStart(2,'0');}
   const months=['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12','2027-01','2027-02'];
-  const lx=months.map(m=>m.slice(2).replace('-','/')),ly=months.map(m=>reservaEquipe(m,'sjc'));
+  const lx=months.map(m=>m.slice(2).replace('-','/')),ly=months.map(m=>reservaEquipe(m,'sjc_trab'));
   const idx=months.indexOf(REF_HOJE);
   destroy('cReservaEvol');
   charts.cReservaEvol=new Chart(cReservaEvol,{type:'line',data:{labels:lx,datasets:[
@@ -627,7 +638,7 @@ function renderReserva(){
       <td class="r num">${N(r.multa)}</td><td class="r num"><b>${N(r.total)}</b></td></tr>`;});
   document.getElementById('resKpis').innerHTML=
     kpi('Reserva total',BRL(T.total),`${ATIVAS().length} ativas · ref. ${ref}`,'warn')+
-    kpi('Multa 40% FGTS',BRL(T.multa),tipo==='sjc'?'aplicável':'não se aplica')+
+    kpi('Multa 40% FGTS',BRL(T.multa),(tipo==='sjc'||tipo==='sjc_trab')?'aplicável':'não se aplica')+
     kpi('13º + férias',BRL(T.decimo+T.ferias),'proporcionais')+
     kpi('Média por pessoa',BRL(T.total/ATIVAS().length),'equipe ativa');
   rows+=`<tr class="tot"><td colspan="3">TOTAL</td><td class="r num">${N(T.aviso)}</td><td class="r num">${N(T.decimo)}</td><td class="r num">${N(T.ferias)}</td><td class="r num">${N(T.multa)}</td><td class="r num">${N(T.total)}</td></tr>`;
@@ -643,7 +654,7 @@ function renderSim(){
   const r=rescisao(c.rescBase,c.rescFgts,meses,tipo);
   document.getElementById('simKpis').innerHTML=
     kpi('Custo total',BRL(r.total),f.nome,'warn')+kpi('Aviso prévio',BRL(r.aviso),r.avisoDias+' dias')+
-    kpi('FGTS acumulado',BRL(r.fgtsAcum),meses+' meses')+kpi('Multa 40%',BRL(r.multa),tipo==='sjc'?'sem justa causa':'isento');
+    kpi('FGTS acumulado',BRL(r.fgtsAcum),meses+(tipo==='sjc_trab'?' meses + aviso':' meses'))+kpi('Multa 40%',BRL(r.multa),(tipo==='sjc'||tipo==='sjc_trab')?'sem justa causa':'isento');
   document.getElementById('tSim').innerHTML=
     `<thead><tr><th>Verba rescisória</th><th class="r">Valor</th><th>Memória</th></tr></thead><tbody>
      <tr><td>Aviso prévio indenizado</td><td class="r num">${BRL(r.aviso)}</td><td class="mono" style="font-size:12px">${r.avisoDias} dias</td></tr>
@@ -686,10 +697,10 @@ function answer(q){
   q=q.toLowerCase();const m=mesDetalhe();
   const f=ATIVAS().find(x=>q.includes(x.nome.split(' ')[0].toLowerCase()));
   if(f&&(q.includes('demit')||q.includes('rescis')||q.includes('custo')||q.includes('demis'))){
-    const c=CARGOS[f.cargo],meses=mesesAvos(f.adm,REF_HOJE),r=rescisao(c.rescBase,c.rescFgts,meses,'sjc');
+    const c=CARGOS[f.cargo],meses=mesesAvos(f.adm,REF_HOJE),r=rescisao(c.rescBase,c.rescFgts,meses,'sjc_trab');
     return `Demitir <b>${f.nome}</b> (${c.nome}, ${meses} meses de casa) sem justa causa: <b>${BRL(r.total)}</b>.<br>Aviso ${BRL(r.aviso)} · 13º ${BRL(r.decimo)} · férias+⅓ ${BRL(r.ferias)} · multa 40% ${BRL(r.multa)}.`;}
   if(q.includes('reserva')||q.includes('toda')||q.includes('equipe'))
-    return `Reserva para encerrar <b>toda a equipe</b> (${ATIVAS().length} ativas) sem justa causa hoje: <b>${BRL(reservaEquipe(REF_HOJE,'sjc'))}</b>. É o caixa mínimo de risco trabalhista.`;
+    return `Reserva para encerrar <b>toda a equipe</b> (${ATIVAS().length} com vínculo ativo) sem justa causa, <b>aviso trabalhado</b>: <b>${BRL(reservaEquipe(REF_HOJE,'sjc_trab'))}</b>, mais a folha do mês de aviso (${BRL(folhaAvisoEquipe(REF_HOJE))}), que é paga com o faturamento desse mês.`;
   if(q.includes('margem')||q.includes('sobra')||q.includes('lucro')){const g=margem(m,6);return `Em ${m.comp}: receita ${BRL(g.rec)}, custo ${BRL(g.custo)}, Simples ~${BRL(g.simples)}. Sobra: <b>${BRL(g.sobra)}</b> (${Math.round(g.sobra/g.rec*100)}%).`;}
   if(q.includes('encargo')||q.includes('imposto')||q.includes('fgts')||q.includes('inss')||q.includes('issqn'))
     return `Encargos de ${m.comp}: FGTS <b>${BRL(m.fgts)}</b>, INSS repassado <b>${BRL(m.inss)}</b>, ISSQN <b>${BRL(m.issqn)}</b>. Simples Nacional, sem INSS patronal à parte.`;
