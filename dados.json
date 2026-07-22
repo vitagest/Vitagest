@@ -142,23 +142,7 @@
     "desc": "Clemir Fedele Lumi Ju"
    }
   ],
-  "futuros": [
-   {
-    "data": "2026-07-20",
-    "valor": 5817.04,
-    "desc": "FGTS competência 06/2026 (agendado)"
-   },
-   {
-    "data": "2026-07-20",
-    "valor": 4022.3,
-    "desc": "INSS DARF competência 06/2026 (agendado)"
-   },
-   {
-    "data": "2026-07-31",
-    "valor": 8020,
-    "desc": "Simples Nacional 06/2026 (ESTIMATIVA ~4,9% — guia ainda não emitida)"
-   }
-  ]
+  "futuros": []
  },
  "funcionarios": [
   {
