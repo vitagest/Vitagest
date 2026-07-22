@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "14/07/2026",
+ "atualizadoEm": "21/07/2026",
  "meses": [
   {
    "comp": "02/2026",
@@ -59,9 +59,9 @@
  ],
  "caixa": {
   "saldoInicial": 1,
-  "saldoReal": 99526.46,
+  "saldoReal": 5086.73,
   "reajuste": 5,
-  "atualizadoEm": "14/07/2026",
+  "atualizadoEm": "21/07/2026",
   "meses": [
    {
     "mes": "03/2026",
@@ -95,9 +95,9 @@
     "mes": "07/2026",
     "entradas": 161355.6,
     "salarios": 67188.62,
-    "impostos": 0,
-    "servicos": 9422.73,
-    "conferido": true
+    "impostos": 18190.31,
+    "servicos": 1355.7,
+    "conferido": false
    }
   ],
   "retiradas": [
@@ -122,9 +122,24 @@
     "desc": "Paula Botelho"
    },
    {
+    "data": "2026-07-06",
+    "valor": 8067.78,
+    "desc": "Paula Botelho"
+   },
+   {
     "data": "2026-07-07",
     "valor": 40000,
     "desc": "Paula Botelho"
+   },
+   {
+    "data": "2026-07-15",
+    "valor": 60000,
+    "desc": "Paula Botelho"
+   },
+   {
+    "data": "2026-07-17",
+    "valor": 16250,
+    "desc": "Clemir Fedele Lumi Ju"
    }
   ],
   "futuros": [
